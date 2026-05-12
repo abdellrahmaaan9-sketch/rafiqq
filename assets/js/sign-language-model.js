@@ -92,13 +92,13 @@
 
   /* ── Phase → UI metadata (used by the page to style each phase) ── */
   const PHASE_META = {
-    [PHASES.IDLE]:       { dot: 'off',      label: 'Ready — start camera to begin',                    color: '#94a3b8' },
-    [PHASES.DETECTING]:  { dot: 'scanning', label: 'Detecting hand…',                                  color: '#60a5fa' },
-    [PHASES.THINKING]:   { dot: 'scanning', label: 'Thinking… analysing hand shape',                   color: '#a78bfa' },
-    [PHASES.ANALYZING]:  { dot: 'found',    label: 'Analysing gesture…',                               color: '#34d399' },
-    [PHASES.CONFIRMING]: { dot: 'found',    label: 'Almost confirmed — hold steady',                   color: '#fbbf24' },
-    [PHASES.CONFIRMED]:  { dot: 'locked',   label: 'Gesture confirmed',                                color: '#16a34a' },
-    [PHASES.UNKNOWN]:    { dot: 'warn',     label: 'Unknown gesture — try a supported sign',           color: '#f97316' },
+    [PHASES.IDLE]:       { dot: 'off',      label: 'Ready — start camera to begin',            color: '#94a3b8' },
+    [PHASES.DETECTING]:  { dot: 'scanning', label: 'Waiting for hand…',                        color: '#60a5fa' },
+    [PHASES.THINKING]:   { dot: 'scanning', label: 'Stabilising pose…',                        color: '#a78bfa' },
+    [PHASES.ANALYZING]:  { dot: 'found',    label: 'Reading gesture…',                         color: '#34d399' },
+    [PHASES.CONFIRMING]: { dot: 'found',    label: 'Almost confirmed — hold steady',            color: '#fbbf24' },
+    [PHASES.CONFIRMED]:  { dot: 'locked',   label: '✓ Sign confirmed',                         color: '#16a34a' },
+    [PHASES.UNKNOWN]:    { dot: 'warn',     label: 'Unrecognised — try a supported sign',      color: '#f97316' },
   };
 
   /* ════════════════════════════════════════════════════════════════

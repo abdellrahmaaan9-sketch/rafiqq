@@ -63,7 +63,8 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
 .hero h1{font-size:clamp(24px,3.8vw,42px);font-weight:900;letter-spacing:-.8px;line-height:1.06;margin-bottom:12px}
 .hero h1 span{background:linear-gradient(90deg,#c4caff,#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero p{font-size:14px;font-weight:600;color:rgba(255,255,255,.78);line-height:1.75;max-width:520px}
-.hero-mvp-tag{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:6px 12px;background:rgba(255,200,50,.15);border:1px solid rgba(255,200,50,.3);border-radius:999px;font-size:11px;font-weight:800;color:#fcd34d}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.hero-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:999px;font-size:11px;font-weight:800;color:rgba(255,255,255,.85)}
 .hero-icon{font-size:80px;filter:drop-shadow(0 10px 28px rgba(0,0,0,.25));flex-shrink:0;animation:float 3.5s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 
@@ -146,14 +147,12 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
 .alert-warn{background:#fffbeb;border:1px solid rgba(217,119,6,.25);color:#78350f}
 
 /* ── AI Analysis Panel ── */
-/* Phase display card */
 .ai-phase-card{padding:22px 20px;border-radius:18px;border:1.5px solid var(--border);margin-bottom:16px;background:var(--bg);transition:border-color .3s,background .3s}
 .ai-phase-card.phase-thinking  {border-color:rgba(167,139,250,.35);background:linear-gradient(135deg,#faf5ff,#ede9fe)}
 .ai-phase-card.phase-analyzing {border-color:rgba(52,211,153,.35);background:linear-gradient(135deg,#f0fdf4,#dcfce7)}
 .ai-phase-card.phase-confirming{border-color:rgba(251,191,36,.35);background:linear-gradient(135deg,#fffbeb,#fef3c7)}
 .ai-phase-card.phase-confirmed {border-color:rgba(22,163,74,.45);background:linear-gradient(135deg,#f0fdf4,#dcfce7)}
 .ai-phase-card.phase-unknown   {border-color:rgba(249,115,22,.35);background:linear-gradient(135deg,#fff7ed,#ffedd5)}
-
 .ai-phase-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .ai-phase-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(100,112,210,.1);color:var(--accent);flex-shrink:0}
 .ai-phase-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
@@ -173,6 +172,9 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
 .dc-conf-pct{font-size:13px;font-weight:900;color:var(--navy);font-family:var(--mono);min-width:36px;text-align:right}
 .dc-meta{display:flex;gap:12px;font-size:10.5px;font-weight:800;color:var(--muted)}
 .dc-meta span{display:flex;align-items:center;gap:4px}
+/* "Lower hand to sign again" hint strip */
+.dc-reset-hint{margin-top:10px;padding:7px 10px;background:rgba(100,112,210,.08);border-radius:9px;font-size:10.5px;font-weight:800;color:var(--accent);display:none;align-items:center;gap:6px}
+.dc-reset-hint.show{display:flex}
 
 /* Session stats */
 .session-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
@@ -185,7 +187,7 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
 .timeline-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 .timeline-clear{font-size:11px;font-weight:800;color:var(--muted);background:none;border:none;cursor:pointer;padding:3px 8px;border-radius:7px;transition:background .14s,color .14s;font-family:"Nunito",sans-serif}
 .timeline-clear:hover{background:#fee2e2;color:var(--red)}
-.timeline-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;padding-right:3px;margin-bottom:16px}
+.timeline-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;padding-right:3px;margin-bottom:16px}
 .timeline-list::-webkit-scrollbar{width:3px}
 .timeline-list::-webkit-scrollbar-thumb{background:rgba(100,112,210,.2);border-radius:99px}
 .tl-item{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:12px;animation:slideIn .2s ease both}
@@ -195,12 +197,15 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
 .tl-time{font-size:10px;font-weight:700;color:var(--muted);font-family:var(--mono)}
 .tl-empty{padding:20px;text-align:center;font-size:12.5px;font-weight:700;color:#a0a3c0}
 
-/* Action buttons */
-.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.action-btn{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border-radius:14px;border:none;font-family:"Nunito",sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:transform .14s,opacity .14s}
+/* Action buttons — 3 columns */
+.action-btns{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.action-btn{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border-radius:14px;border:none;font-family:"Nunito",sans-serif;font-size:13px;font-weight:900;cursor:pointer;transition:transform .14s,box-shadow .14s,background .14s}
 .action-btn:hover:not(:disabled){transform:translateY(-1px)}
 .action-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
 .btn-speak{background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;box-shadow:0 5px 16px rgba(100,112,210,.24)}
+.btn-mute{background:var(--bg);color:var(--muted);border:1.5px solid var(--border)}
+.btn-mute:hover:not(:disabled){background:var(--light);color:var(--accent)}
+.btn-mute.muted{background:#fef2f2;color:var(--red);border-color:rgba(220,38,38,.18)}
 .btn-reset{background:var(--bg);color:var(--muted);border:1.5px solid var(--border)}
 .btn-reset:hover:not(:disabled){background:#fee2e2;color:var(--red);border-color:rgba(220,38,38,.2)}
 
@@ -223,47 +228,83 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
 .library-section h2{font-size:20px;font-weight:900;color:var(--navy);margin-bottom:6px;letter-spacing:-.3px}
 .library-section>p{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:18px;line-height:1.65}
 
-.category-group{margin-bottom:20px}
-.cat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:16px;cursor:pointer;user-select:none;transition:background .15s;margin-bottom:10px}
+.category-group{margin-bottom:16px}
+.cat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:16px;cursor:pointer;user-select:none;transition:background .15s;margin-bottom:0}
 .cat-header:hover{background:var(--light)}
+.cat-header.open{border-radius:16px 16px 0 0;margin-bottom:0;border-bottom:1px solid var(--border)}
 .cat-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;color:#fff}
 .cat-name{font-size:14px;font-weight:900;color:var(--navy);flex:1}
 .cat-count{font-size:11px;font-weight:800;color:var(--muted);background:var(--bg);padding:3px 9px;border-radius:999px}
 .cat-chevron{font-size:12px;color:var(--muted);transition:transform .2s}
 .cat-header.open .cat-chevron{transform:rotate(180deg)}
-.cat-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px;display:none;padding:0 4px}
+
+/* Cards container — hidden by default, shown when .open */
+.cat-cards{
+  display:none;
+  grid-template-columns:repeat(auto-fill,minmax(152px,1fr));
+  gap:10px;
+  padding:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-top:none;
+  border-radius:0 0 16px 16px;
+  align-items:stretch;
+}
 .cat-header.open+.cat-cards{display:grid}
 
-.gesture-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:14px 12px;text-align:center;cursor:default;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative}
-.gesture-card:hover,.gesture-card:focus{transform:translateY(-3px);box-shadow:var(--sh-lg);border-color:rgba(100,112,210,.3);outline:none}
-.gesture-card.active-gesture{border-color:var(--accent);background:var(--light);box-shadow:0 0 0 3px rgba(100,112,210,.12)}
-.gesture-card.future{opacity:.65}
-.gesture-card-name{font-size:13px;font-weight:900;color:var(--navy);margin-bottom:5px;font-family:var(--mono)}
-.gesture-card-desc{font-size:10.5px;font-weight:700;color:var(--muted);line-height:1.45}
-.gesture-card-badge{position:absolute;top:8px;right:8px;font-size:8.5px;font-weight:900;padding:2px 6px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
-.badge-mvp{background:var(--light);color:var(--accent)}
-.badge-ai{background:#fef9c3;color:#854d0e}
+/* Gesture card — enriched layout */
+.gesture-card{
+  background:var(--bg);
+  border:1.5px solid var(--border);
+  border-radius:16px;
+  padding:14px 13px 12px;
+  cursor:default;
+  transition:transform .15s,box-shadow .15s,border-color .15s;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.gesture-card:hover,.gesture-card:focus{transform:translateY(-3px);box-shadow:var(--sh-lg);border-color:rgba(100,112,210,.28);outline:none}
+.gesture-card.active-gesture{border-color:var(--accent);background:linear-gradient(135deg,#f8faff,#eef1ff);box-shadow:0 0 0 3px rgba(100,112,210,.12)}
+.gesture-card.future{opacity:.72}
+
+.gc-emoji{font-size:22px;line-height:1;margin-bottom:2px}
+.gc-name{font-size:12px;font-weight:900;color:var(--navy);font-family:var(--mono)}
+.gc-arabic{font-size:10.5px;font-weight:700;color:var(--muted);direction:rtl;margin-bottom:2px}
+.gc-hint{font-size:10px;font-weight:700;color:var(--muted);line-height:1.45;flex:1}
+
+/* Badges */
+.gesture-card-badge{
+  display:inline-block;
+  margin-top:6px;
+  align-self:flex-start;
+  font-size:8.5px;font-weight:900;
+  padding:2px 7px;border-radius:999px;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.badge-ready {background:#dcfce7;color:#166534}
+.badge-soon  {background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0}
 .badge-active{background:#dcfce7;color:#166534;animation:blink .7s ease-in-out infinite}
 
 /* ── Info notes ── */
 .info-note{margin-top:18px;padding:18px 20px;border-radius:18px;font-size:13px;font-weight:700;line-height:1.75;display:flex;gap:14px;align-items:flex-start}
 .info-note.blue{background:#eff6ff;border:1.5px solid rgba(59,130,246,.22);color:#1e3a5f}
-.info-note.amber{background:#fffbeb;border:1.5px solid #fcd34d;color:#78350f}
 .info-note i{font-size:17px;flex-shrink:0;margin-top:2px}
-.info-note code{background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:11.5px;font-family:var(--mono)}
 
 /* ── Responsive ── */
-@media(max-width:860px){.main-grid{grid-template-columns:1fr}.hero{padding:28px 28px 36px;margin:0 -24px}.hero-icon{font-size:54px}}
-@media(max-width:540px){.wrap{padding:0 14px 48px}.hero{padding:22px 18px 28px;margin:0 -14px}.session-stats{grid-template-columns:1fr 1fr}}
+@media(max-width:860px){.main-grid{grid-template-columns:1fr}.hero{padding:28px 28px 36px;margin:0 -24px}.hero-icon{font-size:54px}.action-btns{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:540px){.wrap{padding:0 14px 48px}.hero{padding:22px 18px 28px;margin:0 -14px}.session-stats{grid-template-columns:1fr 1fr}.action-btns{grid-template-columns:1fr 1fr;gap:8px}.btn-speak{grid-column:1/-1}}
+@media(max-width:420px){.cat-cards{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}}
 @media(forced-colors:active){.phase-dot,.prog-bar,.dc-conf-bar{forced-color-adjust:auto}.cam-btn,.action-btn{border:2px solid ButtonText}}
 </style>
 </head>
 <body>
 
 <div id="mpLoadOverlay" role="status" aria-live="assertive" aria-label="Loading AI hand detection">
-    <div class="mp-spinner" aria-hidden="true"></div>
-    <div class="mp-load-title">Loading Rafiq Sign AI…</div>
-    <div class="mp-load-sub">Preparing hand detection models</div>
+  <div class="mp-spinner" aria-hidden="true"></div>
+  <div class="mp-load-title">Loading Rafiq Sign AI…</div>
+  <div class="mp-load-sub">Preparing hand detection models</div>
 </div>
 
 <?php include 'nav_patient.php'; ?>
@@ -285,10 +326,11 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
           Real-Time · 3D Joint Analysis · Multi-Frame Confirmation
         </div>
         <h1>AI <span>Sign Language</span> Assistant</h1>
-        <p>Show your hand to the camera. The AI tracks 21 hand landmarks, analyses joint angles in 3-D, and only confirms a sign after sustained multi-frame agreement — not a single random frame.</p>
-        <div class="hero-mvp-tag">
-          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-          MVP v3 — 11 detectable static signs · 40+ signs planned · TF.js model ready to connect
+        <p>Show your hand to the camera. The AI tracks 21 hand landmarks, analyses joint angles in 3-D, and only confirms a sign after it holds steady across multiple frames — eliminating false detections.</p>
+        <div class="hero-tags">
+          <span class="hero-tag"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> 11 signs live now</span>
+          <span class="hero-tag"><i class="fa-solid fa-volume-high" aria-hidden="true"></i> Voice feedback</span>
+          <span class="hero-tag"><i class="fa-solid fa-shield-check" aria-hidden="true"></i> No repeat detection</span>
         </div>
       </div>
       <div class="hero-icon" aria-hidden="true">🤟</div>
@@ -364,7 +406,7 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
         <!-- Live score panel -->
         <div class="score-panel" id="scorePanel" aria-label="Live gesture scores">
           <div class="score-panel-title">
-            <span>Live scores — all signs</span>
+            <span>Live confidence — all signs</span>
             <button class="score-toggle" id="scoreHide" aria-label="Hide scores">Hide</button>
           </div>
           <div id="scoreRows"></div>
@@ -380,7 +422,7 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
         <div class="card-head-icon"><i class="fa-solid fa-brain" aria-hidden="true"></i></div>
         <div>
           <div class="card-head-title" id="aiHeading">AI Analysis</div>
-          <div class="card-head-sub">Phase engine · 3-stage confirmation</div>
+          <div class="card-head-sub">Phase engine · 3-stage confirmation · no repeat detection</div>
         </div>
       </div>
       <div class="card-body">
@@ -397,7 +439,7 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
           </div>
         </div>
 
-        <!-- Confirmed detection card (shown on confirmation) -->
+        <!-- Confirmed detection card -->
         <div class="detection-card" id="detectionCard" aria-live="assertive" aria-atomic="true">
           <div class="dc-label">Confirmed Sign</div>
           <div class="dc-name" id="dcName"></div>
@@ -408,6 +450,11 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
           <div class="dc-meta">
             <span><i class="fa-regular fa-clock" aria-hidden="true"></i> <span id="dcTime"></span></span>
             <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i> <span id="dcCat"></span></span>
+          </div>
+          <!-- Shown after confirmation, until hand is lowered -->
+          <div class="dc-reset-hint" id="dcResetHint" aria-live="polite">
+            <i class="fa-solid fa-hand" aria-hidden="true"></i>
+            Lower your hand to sign again
           </div>
         </div>
 
@@ -438,13 +485,16 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
           </div>
         </div>
 
-        <!-- Action buttons -->
+        <!-- Action buttons: Speak | Mute | Reset -->
         <div class="action-btns">
           <button class="action-btn btn-speak" id="speakBtn" aria-label="Speak last detected sign" disabled>
             <i class="fa-solid fa-volume-high" aria-hidden="true"></i> Speak Last
           </button>
+          <button class="action-btn btn-mute" id="muteBtn" aria-label="Toggle voice mute">
+            <i class="fa-solid fa-volume-high" id="muteIcon" aria-hidden="true"></i>
+          </button>
           <button class="action-btn btn-reset" id="resetBtn" aria-label="Reset session">
-            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset Session
+            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
           </button>
         </div>
 
@@ -452,35 +502,25 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
     </div>
   </div>
 
-  <!-- Gesture Library (categorised from dataset) -->
+  <!-- Gesture Library -->
   <section class="library-section" aria-labelledby="libHeading">
     <h2 id="libHeading">Gesture Library</h2>
-    <p>Green <strong>MVP</strong> signs are detectable by the current rule-based AI. Signs marked <strong>Needs AI</strong> require a trained TensorFlow.js model — see the roadmap note below.</p>
+    <p>
+      Signs marked <strong style="color:var(--green)">Supported</strong> are detectable right now by the AI.
+      Signs marked <strong style="color:#64748b">Coming Soon</strong> will be added in future updates as the model is extended.
+    </p>
     <div id="libraryContainer"><!-- categories injected by JS --></div>
   </section>
 
-  <!-- Info notes -->
+  <!-- Info note -->
   <div class="info-note blue" style="margin-top:20px">
     <i class="fa-solid fa-circle-info" style="color:#3b82f6" aria-hidden="true"></i>
     <div>
-      <strong>How multi-frame confirmation works (v3):</strong>
-      Every frame is classified using 3D joint-angle geometry across all 11 MVP signs.
-      An exponential smoother weights recent frames more heavily.
-      A sign is only confirmed when its weighted vote ratio exceeds <strong>0.52</strong> across
-      <strong>≥ 17 consecutive frames</strong>, with sufficient separation from the next-best candidate.
-      This prevents any single ambiguous frame from triggering a false result.
-    </div>
-  </div>
-  <div class="info-note amber" style="margin-top:12px">
-    <i class="fa-solid fa-robot" style="color:#d97706" aria-hidden="true"></i>
-    <div>
-      <strong>Connecting a trained AI model (future):</strong>
-      The architecture is fully prepared. Static signs need a TF.js MLP model
-      (<code>input: [1, 63]</code>). Dynamic signs need an LSTM
-      (<code>input: [1, 30, 63]</code>).
-      Call <code>SLModel.connectTrainedModel(fn)</code> or
-      <code>SLModel.connectTrainedModelDynamic(fn)</code> before starting the camera.
-      Full examples are documented in <code>assets/js/sign-language-model.js §5</code>.
+      <strong>How stable detection works:</strong>
+      Every camera frame is scored using 3D joint-angle geometry across all supported signs.
+      A sign is only confirmed after its weighted vote ratio exceeds the threshold across
+      <strong>17+ consecutive frames</strong> — preventing any single ambiguous frame from triggering a false result.
+      Once confirmed, the same sign cannot re-trigger until you lower your hand, eliminating the repeat-detection problem.
     </div>
   </div>
 
@@ -499,6 +539,51 @@ body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--
 'use strict';
 
 const BASE = '<?= $_base ?>';
+
+/* ── Gesture visual guide: emoji + short hand hint for every sign ── */
+const GESTURE_GUIDE = {
+  'hello':         { emoji: '👋',  hint: 'Open palm · all 5 fingers spread wide' },
+  'yes':           { emoji: '👍',  hint: 'Fist · thumb pointing straight up' },
+  'no':            { emoji: '🤘',  hint: 'Index + pinky up · horns shape' },
+  'thank_you':     { emoji: '🤚',  hint: 'Thumb + index + middle up · rest folded' },
+  'ily':           { emoji: '🤟',  hint: 'Thumb + index + pinky · ILY handshape' },
+  'please':        { emoji: '✋',  hint: 'Flat hand · circles clockwise on chest' },
+  'sorry':         { emoji: '✊',  hint: 'Fist · circles on chest' },
+  'goodbye':       { emoji: '🖐️',  hint: 'Open palm · wave side to side' },
+  'youre_welcome': { emoji: '🤲',  hint: 'Flat hand sweeps inward from chin' },
+  'emergency':     { emoji: '🆘',  hint: 'Tight closed fist · hold up clearly' },
+  'help':          { emoji: '🖐️',  hint: '4 fingers straight up · thumb tucked to palm' },
+  'stop':          { emoji: '✋',  hint: 'Palm facing forward · thrust outward' },
+  'danger':        { emoji: '⚠️',  hint: 'D-handshape · sharp downward motion' },
+  'call_ambulance':{ emoji: '📞',  hint: 'Phone Y-shape near ear' },
+  'hospital':      { emoji: '✌️',  hint: 'Peace sign · index + middle only' },
+  'pain':          { emoji: '💢',  hint: 'Both index fingers point at each other' },
+  'medicine':      { emoji: '💊',  hint: 'Middle finger flicks off thumb' },
+  'doctor':        { emoji: '👨‍⚕️', hint: 'D-shape · taps on wrist' },
+  'sick':          { emoji: '🤒',  hint: 'Bent middle finger · forehead to stomach' },
+  'allergy':       { emoji: '🤧',  hint: 'Index traces down from nose' },
+  'water':         { emoji: '💧',  hint: 'Index + middle + ring up · W shape' },
+  'food':          { emoji: '🍽️',  hint: 'Fingertips pinched · moves toward mouth' },
+  'hungry':        { emoji: '🫙',  hint: 'C-shape · moves down on chest' },
+  'thirsty':       { emoji: '💦',  hint: 'Index traces down the throat' },
+  'hot':           { emoji: '🔥',  hint: 'Claw near mouth · opens sharply out' },
+  'cold':          { emoji: '🥶',  hint: 'Both fists tremble and shake' },
+  'car':           { emoji: '🚗',  hint: 'Both hands grip imaginary steering wheel' },
+  'wheelchair':    { emoji: '♿',  hint: 'Index fingers roll forward in circles' },
+  'taxi':          { emoji: '🚕',  hint: 'Bent index waves downward · hailing' },
+  'bus':           { emoji: '🚌',  hint: 'B-shapes pull apart · bus doors opening' },
+  'one':           { emoji: '☝️',  hint: 'Index finger only · all others closed' },
+  'bad':           { emoji: '👎',  hint: 'Fist · thumb pointing straight down' },
+  'more':          { emoji: '🤌',  hint: 'Fingertips pinch + tap together' },
+  'finished':      { emoji: '🙌',  hint: 'Both hands flip outward from wrists' },
+  'wait':          { emoji: '🖐️',  hint: 'Both hands wiggle fingers softly' },
+  'understand':    { emoji: '💡',  hint: 'Index flicks up at forehead' },
+  'caregiver':     { emoji: '🤲',  hint: 'One hand cradles and supports the other' },
+  'interpreter':   { emoji: '🔄',  hint: 'Index fingers alternate left and right' },
+  'blind':         { emoji: '👁️',  hint: 'V-shape touches eyes · moves away' },
+  'deaf':          { emoji: '👂',  hint: 'Index traces from ear to chin' },
+  'accessible':    { emoji: '♿',  hint: 'Both hands open outward from center' },
+};
 
 /* ── DOM refs ── */
 const videoEl        = document.getElementById('videoEl');
@@ -531,6 +616,7 @@ const dcConfBar      = document.getElementById('dcConfBar');
 const dcConfPct      = document.getElementById('dcConfPct');
 const dcTime         = document.getElementById('dcTime');
 const dcCat          = document.getElementById('dcCat');
+const dcResetHint    = document.getElementById('dcResetHint');
 const statSigns      = document.getElementById('statSigns');
 const statDuration   = document.getElementById('statDuration');
 const statTop        = document.getElementById('statTop');
@@ -538,6 +624,8 @@ const timelineList   = document.getElementById('timelineList');
 const tlEmpty        = document.getElementById('tlEmpty');
 const clearBtn       = document.getElementById('clearBtn');
 const speakBtn       = document.getElementById('speakBtn');
+const muteBtn        = document.getElementById('muteBtn');
+const muteIcon       = document.getElementById('muteIcon');
 const resetBtn       = document.getElementById('resetBtn');
 const scorePanel     = document.getElementById('scorePanel');
 const scoreRows      = document.getElementById('scoreRows');
@@ -552,17 +640,18 @@ let mpCamera         = null;
 let videoStream      = null;
 let isRunning        = false;
 let framesSinceHand  = 0;
-let lightFrameCount  = 0;
 let lowLightFrames   = 0;
 let currentSpeak     = '';
+let isMuted          = false;
 let scorePanelOpen   = false;
 let statsTimer       = null;
+let lastConfirmedPhase = false;  // true while phase=confirmed + !isNew (holding)
 const _scoreEls      = {};
 
 /* ── Load gesture dataset & build library ── */
 SLModel.init(BASE + '/assets/data/gesture-dataset.json').then(() => {
     buildLibrary();
-}).catch(() => buildLibrary()); // build with empty dataset if fetch fails
+}).catch(() => buildLibrary());
 
 function buildLibrary() {
     const cats  = SLModel.getCategories();
@@ -574,46 +663,54 @@ function buildLibrary() {
     }
 
     cats.forEach(cat => {
-        const catSigns = signs.filter(s => s.category === cat.id);
-        const mvpCount = catSigns.filter(s => s.mvp).length;
+        const catSigns  = signs.filter(s => s.category === cat.id);
+        const liveCount = catSigns.filter(s => s.mvp).length;
 
-        const group = document.createElement('div');
+        const group  = document.createElement('div');
         group.className = 'category-group';
 
         const header = document.createElement('div');
         header.className = 'cat-header';
-        // Open greetings + emergency by default
         if (cat.id === 'greetings' || cat.id === 'emergency') header.classList.add('open');
         header.innerHTML = `
             <div class="cat-icon" style="background:${cat.color || '#6470d2'}">
                 <i class="fa-solid ${cat.icon || 'fa-hand'}" aria-hidden="true"></i>
             </div>
             <div class="cat-name">${cat.name}</div>
-            <div class="cat-count">${mvpCount} MVP · ${catSigns.length} total</div>
+            <div class="cat-count">${liveCount} live · ${catSigns.length} total</div>
             <i class="fa-solid fa-chevron-down cat-chevron" aria-hidden="true"></i>`;
-        header.addEventListener('click', () => header.classList.toggle('open'));
         header.setAttribute('tabindex','0');
         header.setAttribute('role','button');
         header.setAttribute('aria-expanded', header.classList.contains('open') ? 'true' : 'false');
-        header.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); header.click(); } });
+        header.addEventListener('click', () => {
+            header.classList.toggle('open');
+            header.setAttribute('aria-expanded', header.classList.contains('open') ? 'true' : 'false');
+        });
+        header.addEventListener('keydown', e => {
+            if (e.key==='Enter' || e.key===' ') { e.preventDefault(); header.click(); }
+        });
 
         const cards = document.createElement('div');
         cards.className = 'cat-cards';
 
         catSigns.forEach(sign => {
-            const card = document.createElement('div');
+            const guide = GESTURE_GUIDE[sign.id] || { emoji: '🤚', hint: sign.description || '' };
+            const card  = document.createElement('div');
             card.className = 'gesture-card' + (sign.mvp ? '' : ' future');
             card.setAttribute('tabindex','0');
             card.setAttribute('role','listitem');
-            card.setAttribute('aria-label', sign.name + ': ' + sign.description);
+            card.setAttribute('aria-label', sign.name + ': ' + guide.hint);
             card.dataset.gesture = sign.name;
-            const badge = sign.mvp
-                ? `<span class="gesture-card-badge badge-mvp">MVP</span>`
-                : `<span class="gesture-card-badge badge-ai">Needs AI</span>`;
+
+            const badgeClass = sign.mvp ? 'badge-ready' : 'badge-soon';
+            const badgeLabel = sign.mvp ? 'Supported' : 'Coming Soon';
+
             card.innerHTML = `
-                ${badge}
-                <div class="gesture-card-name">${sign.name}</div>
-                <div class="gesture-card-desc">${sign.description}</div>`;
+                <div class="gc-emoji" aria-hidden="true">${guide.emoji}</div>
+                <div class="gc-name">${sign.name}</div>
+                ${sign.arabic ? `<div class="gc-arabic">${sign.arabic}</div>` : ''}
+                <div class="gc-hint">${guide.hint}</div>
+                <span class="gesture-card-badge ${badgeClass}">${badgeLabel}</span>`;
             cards.appendChild(card);
         });
 
@@ -627,7 +724,7 @@ function buildLibrary() {
 (function buildScoreRows() {
     const signs = SLClassifier ? Object.keys(SLClassifier.SIGNS) : [];
     signs.forEach(name => {
-        const row = document.createElement('div');
+        const row  = document.createElement('div');
         row.className = 'score-row';
         const safe = name.replace(/\s/g,'_');
         row.innerHTML = `
@@ -654,7 +751,6 @@ scoreShow.addEventListener('click', () => {
     scoreShow.style.display = 'none';
 });
 
-/* ── Update score bars ── */
 function updateScores(scores, leading) {
     if (!scorePanelOpen || !scores) return;
     for (const [name, el] of Object.entries(_scoreEls)) {
@@ -672,31 +768,41 @@ function highlightCard(name) {
         const match = c.dataset.gesture === name;
         c.classList.toggle('active-gesture', match);
         const badge = c.querySelector('.gesture-card-badge');
-        if (badge && match) badge.className = 'gesture-card-badge badge-active';
-        else if (badge && c.dataset.gesture) {
+        if (!badge) return;
+        if (match) {
+            badge.className = 'gesture-card-badge badge-active';
+        } else {
             const sign = SLModel.getAllSigns().find(s => s.name === c.dataset.gesture);
-            if (sign) badge.className = 'gesture-card-badge ' + (sign.mvp ? 'badge-mvp' : 'badge-ai');
+            if (sign) badge.className = 'gesture-card-badge ' + (sign.mvp ? 'badge-ready' : 'badge-soon');
         }
     });
 }
 
-/* ── Phase UI ── */
+/* ── Phase UI constants ── */
 const PHASE_DOT_MAP = {
     idle:'off', detecting:'scanning', thinking:'scanning',
     analyzing:'found', confirming:'found', confirmed:'locked', unknown:'warn'
 };
 const PHASE_ICON_MAP = {
     idle:'fa-circle-pause', detecting:'fa-magnifying-glass', thinking:'fa-brain',
-    analyzing:'fa-waveform-lines', confirming:'fa-circle-half-stroke', confirmed:'fa-circle-check', unknown:'fa-circle-question'
+    analyzing:'fa-waveform-lines', confirming:'fa-circle-half-stroke',
+    confirmed:'fa-circle-check', unknown:'fa-circle-question'
 };
 const PHASE_CARD_CLASSES = ['phase-thinking','phase-analyzing','phase-confirming','phase-confirmed','phase-unknown'];
 
+/* ── Apply phase UI ── */
 function applyPhaseUI(result) {
     const { phase, gesture, candidate, confidence, fillRatio, meta, scores, isNew } = result;
 
     // Dot
     phaseDot.className = 'phase-dot ' + (PHASE_DOT_MAP[phase] || 'off');
-    phaseText.textContent = meta ? meta.label : phase;
+
+    // Phase text — special case: confirmed but holding (no re-trigger)
+    if (phase === 'confirmed' && !isNew && gesture) {
+        phaseText.textContent = '↓ Lower hand to sign again';
+    } else {
+        phaseText.textContent = meta ? meta.label : phase;
+    }
 
     // Confidence pill
     if (confidence > 0.05) {
@@ -718,28 +824,33 @@ function applyPhaseUI(result) {
     PHASE_CARD_CLASSES.forEach(c => aiPhaseCard.classList.remove(c));
     if (phase !== 'idle') aiPhaseCard.classList.add('phase-' + phase);
 
-    // Phase icon + text
+    // Phase icon + label
     aiPhaseIcon.innerHTML = `<i class="fa-solid ${PHASE_ICON_MAP[phase] || 'fa-circle-pause'}" aria-hidden="true"></i>`;
     aiPhaseLabel.textContent = phase.charAt(0).toUpperCase() + phase.slice(1);
     aiPhaseStatus.textContent = meta ? meta.label : '';
-    aiCandidate.textContent = candidate && phase !== 'confirmed' ? 'Candidate: ' + candidate : '';
+    aiCandidate.textContent   = candidate && phase !== 'confirmed' ? 'Candidate: ' + candidate : '';
 
-    // Confirmed detection card
+    // Reset hint visibility — only show when holding a confirmed sign
+    const isHolding = phase === 'confirmed' && !isNew && gesture;
+    dcResetHint.classList.toggle('show', isHolding);
+
+    // On NEW confirmed detection
     if (phase === 'confirmed' && gesture && isNew) {
         const pctNum = Math.round(confidence * 100);
         const now    = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
         const cat    = SLModel.getCategory(gesture.toLowerCase().replace(/\s/g,'_'));
 
-        dcName.textContent   = gesture;
-        dcConfBar.style.width= pctNum + '%';
-        dcConfPct.textContent= pctNum + '%';
-        dcTime.textContent   = now;
-        dcCat.textContent    = cat ? cat.name : 'Sign Language';
+        dcName.textContent    = gesture;
+        dcConfBar.style.width = pctNum + '%';
+        dcConfPct.textContent = pctNum + '%';
+        dcTime.textContent    = now;
+        dcCat.textContent     = cat ? cat.name : 'Sign Language';
 
-        detectionCard.classList.add('show');
-        detectionCard.classList.remove('show'); // reset animation
+        // Restart the pop animation
+        detectionCard.classList.remove('show');
         void detectionCard.offsetWidth;
         detectionCard.classList.add('show');
+        dcResetHint.classList.remove('show');
 
         addToTimeline(gesture, pctNum, now);
         speakBtn.disabled = false;
@@ -756,8 +867,7 @@ function applyPhaseUI(result) {
 function setHandPresence(present) {
     handGuide.className = 'hand-guide' + (present ? ' active' : ' hidden');
     [ccTL,ccTR,ccBL,ccBR].forEach(c => {
-        c.className = c.className.replace(' active','');
-        if (present) c.className += ' active';
+        c.classList.toggle('active', present);
     });
 }
 
@@ -774,14 +884,16 @@ function addToTimeline(name, pct, time) {
 function clearAll() {
     timelineList.innerHTML = '';
     timelineList.appendChild(tlEmpty);
-    tlEmpty.style.display = 'block';
+    tlEmpty.style.display  = 'block';
     detectionCard.classList.remove('show');
+    dcResetHint.classList.remove('show');
     speakBtn.disabled = true;
     currentSpeak      = '';
     highlightCard(null);
     updateScores({}, null);
     SLModel.resetSession();
     updateStats();
+    window.speechSynthesis && window.speechSynthesis.cancel();
 }
 
 /* ── Stats timer ── */
@@ -823,7 +935,6 @@ async function onResults(results) {
     framesSinceHand++;
     const lm = results.multiHandLandmarks[0];
 
-    // Draw skeleton
     if (typeof drawConnectors !== 'undefined') {
         drawConnectors(ctx, lm, HAND_CONNECTIONS, { color:'rgba(100,112,210,0.7)', lineWidth:2.5 });
         drawLandmarks(ctx, lm, { color:'#fff', fillColor:'rgba(100,112,210,0.55)', lineWidth:1, radius:4 });
@@ -831,14 +942,13 @@ async function onResults(results) {
 
     checkLighting();
 
-    // Process through model (async for future AI model support)
     const result = await SLModel.onFrame(lm, framesSinceHand);
     applyPhaseUI(result);
 }
 
 /* ── Camera start / stop ── */
 async function startCamera() {
-    startBtn.disabled = true;
+    startBtn.disabled  = true;
     startBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Starting…';
     errorBanner.classList.remove('show');
     mpLoadOverlay.classList.remove('hidden');
@@ -865,14 +975,14 @@ async function startCamera() {
 
         isRunning = true;
         mpLoadOverlay.classList.add('hidden');
-        startBtn.disabled = true;
-        stopBtn.disabled  = false;
+        startBtn.disabled  = true;
+        stopBtn.disabled   = false;
         startBtn.innerHTML = '<i class="fa-solid fa-play" aria-hidden="true"></i> Start Camera';
 
         SLModel.resetSession();
         statsTimer = setInterval(updateStats, 1000);
-        phaseDot.className = 'phase-dot scanning';
-        phaseText.textContent = 'Detecting hands…';
+        phaseDot.className    = 'phase-dot scanning';
+        phaseText.textContent = 'Waiting for hand…';
 
     } catch(e) {
         console.error(e);
@@ -880,7 +990,7 @@ async function startCamera() {
         startBtn.disabled  = false;
         startBtn.innerHTML = '<i class="fa-solid fa-play" aria-hidden="true"></i> Start Camera';
         errorBanner.classList.add('show');
-        phaseDot.className = 'phase-dot off';
+        phaseDot.className    = 'phase-dot off';
         phaseText.textContent = 'Camera access denied';
     }
 }
@@ -899,14 +1009,16 @@ function stopCamera() {
     lightingWarn.classList.remove('show');
     setHandPresence(false);
     SLModel.onNoHand();
+    window.speechSynthesis && window.speechSynthesis.cancel();
 
-    framesSinceHand  = 0;
-    lowLightFrames   = 0;
-    _lightCnt        = 0;
+    framesSinceHand = 0;
+    lowLightFrames  = 0;
+    _lightCnt       = 0;
+    dcResetHint.classList.remove('show');
 
     startBtn.disabled = false;
     stopBtn.disabled  = true;
-    phaseDot.className   = 'phase-dot off';
+    phaseDot.className    = 'phase-dot off';
     phaseText.textContent = 'Camera off — click Start Camera';
     phaseConf.className   = 'phase-conf';
     progBar.style.width   = '0%';
@@ -920,17 +1032,31 @@ function stopCamera() {
 
 /* ── TTS ── */
 function speak(text) {
-    if (!text || !window.speechSynthesis) return;
+    if (!text || !window.speechSynthesis || isMuted) return;
     window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.rate = 0.88; utt.pitch = 1; utt.lang = 'en-US';
+    const utt   = new SpeechSynthesisUtterance(text);
+    utt.rate  = 0.88;
+    utt.pitch = 1;
+    utt.lang  = 'en-US';
     window.speechSynthesis.speak(utt);
+}
+
+/* ── Mute toggle ── */
+function toggleMute() {
+    isMuted = !isMuted;
+    muteBtn.classList.toggle('muted', isMuted);
+    muteIcon.className = isMuted
+        ? 'fa-solid fa-volume-xmark'
+        : 'fa-solid fa-volume-high';
+    muteBtn.setAttribute('aria-label', isMuted ? 'Unmute voice' : 'Mute voice');
+    if (isMuted) window.speechSynthesis && window.speechSynthesis.cancel();
 }
 
 /* ── Events ── */
 startBtn.addEventListener('click', startCamera);
 stopBtn.addEventListener('click', stopCamera);
 speakBtn.addEventListener('click', () => speak(currentSpeak));
+muteBtn.addEventListener('click', toggleMute);
 resetBtn.addEventListener('click', clearAll);
 clearBtn.addEventListener('click', clearAll);
 
@@ -938,6 +1064,7 @@ document.addEventListener('keydown', e => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     if (e.code === 'Space')                             { e.preventDefault(); isRunning ? stopCamera() : startCamera(); }
     if (e.code === 'KeyS' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); speak(currentSpeak); }
+    if (e.code === 'KeyM' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); toggleMute(); }
     if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); clearAll(); }
 });
 

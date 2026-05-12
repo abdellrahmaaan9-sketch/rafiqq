@@ -621,6 +621,9 @@
   const _buf = [];        // Rolling buffer of { gesture, confidence }
   let _lastConfirmed   = null;
   let _lastConfirmedAt = 0;
+  // Prevents re-confirming the SAME gesture while the hand stays in frame.
+  // Cleared only when the hand disappears (resetSmoother) or a different sign takes over.
+  let _waitForReset    = false;
 
   /**
    * smooth(classifyResult)
@@ -681,13 +684,28 @@
 
     // ── Confirmation check ─────────────────────────────────────
     if (enoughFrames && topScore >= PARAMS.MIN_CONFIRM && topGesture !== null) {
-      const now   = Date.now();
-      const isNew = topGesture !== _lastConfirmed ||
-                    (now - _lastConfirmedAt) > PARAMS.COOLDOWN_MS;
+      const now = Date.now();
+
+      // If a DIFFERENT gesture has taken over while we were waiting for a reset,
+      // clear the wait so the new gesture can confirm immediately.
+      if (_waitForReset && topGesture !== _lastConfirmed) {
+        _waitForReset = false;
+      }
+
+      // isNew fires only when:
+      //   (a) the hand was lowered/reset since last confirmation, OR
+      //   (b) this is a genuinely different gesture
+      // It does NOT fire just because COOLDOWN_MS elapsed while the hand
+      // keeps holding the same pose — that was the source of the repeat-speak bug.
+      const isNew = !_waitForReset && (
+        topGesture !== _lastConfirmed ||
+        (now - _lastConfirmedAt) > PARAMS.COOLDOWN_MS
+      );
 
       if (isNew) {
         _lastConfirmed   = topGesture;
         _lastConfirmedAt = now;
+        _waitForReset    = true;   // require hand removal before re-confirming same sign
       }
 
       return {
@@ -717,8 +735,9 @@
    * still wait COOLDOWN_MS before re-firing.
    */
   function resetSmoother() {
-    _buf.length = 0;
-    // _lastConfirmed / _lastConfirmedAt intentionally preserved
+    _buf.length   = 0;
+    _waitForReset = false;  // hand left frame — allow re-confirmation on next appearance
+    // _lastConfirmed / _lastConfirmedAt preserved (cooldown still applies across appearances)
   }
 
   /* ════════════════════════════════════════════════════════════════
