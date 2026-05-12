@@ -5,40 +5,36 @@ $_dir  = str_replace('\\', '/', dirname(__DIR__));
 $_rel  = ltrim(str_replace($_doc, '', $_dir), '/');
 $_base = '/' . $_rel;
 
-$role         = $_SESSION['role'] ?? '';
-$providerType = $_SESSION['provider_type'] ?? '';
+$role = $_SESSION['role'] ?? '';
+$pt   = $_SESSION['provider_type'] ?? '';
 
-$back_link    = "$_base/general/login.php";
-$home_link    = "$_base/general/login.php";
-$bookings_link= "$_base/general/login.php";
-$profile_link = "$_base/general/login.php";
+$home_link     = "$_base/general/login.php";
+$bookings_link = "$_base/general/login.php";
+$profile_link  = "$_base/general/login.php";
+$back_link     = "$_base/general/login.php";
 
 if ($role === 'patient') {
     $home_link     = "$_base/patient/patient_homepage.php";
-    $back_link     = $home_link;
     $bookings_link = "$_base/patient/my_bookings.php";
     $profile_link  = "$_base/patient/patient_profile.php";
+    $back_link     = $home_link;
 } elseif ($role === 'provider') {
-    $pm = [
-        'doctor'      => "$_base/providers/doctor/doctor_homepage.php",
-        'interpreter' => "$_base/providers/interpreter/int_homepage.php",
-        'driver'      => "$_base/providers/driver/driver_portal.php",
-        'caregiver'   => "$_base/providers/caregiver/caregiver_home.php"
-    ];
-    $home_link  = $pm[$providerType] ?? $back_link;
-    $back_link  = $home_link;
-    $profile_link = $pm[$providerType] ?? $back_link;
+    $pm = ['doctor'=>"$_base/providers/doctor/doctor_homepage.php",'interpreter'=>"$_base/providers/interpreter/int_homepage.php",'driver'=>"$_base/providers/driver/driver_portal.php",'caregiver'=>"$_base/providers/caregiver/caregiver_home.php"];
+    $home_link    = $pm[$pt] ?? $home_link;
+    $back_link    = $home_link;
+    $profile_link = $pm[$pt] ?? $profile_link;
 }
 
 $vc_links = json_encode([
-    'home'          => $home_link,
-    'bookings'      => $bookings_link,
-    'profile'       => $profile_link,
-    'sign_language' => "$_base/general/sign_language.php",
-    'ocr'           => "$_base/general/ocr_reader.php",
-    'voice'         => "$_base/general/voice_companion.php",
-    'logout'        => "$_base/general/logout.php",
-]);
+    'home'     => $home_link,
+    'bookings' => $bookings_link,
+    'profile'  => $profile_link,
+    'sl'       => "$_base/general/sign_language.php",
+    'ocr'      => "$_base/general/ocr_reader.php",
+    'voice'    => "$_base/general/voice_companion.php",
+    'map'      => "$_base/patient/map.php",
+    'logout'   => "$_base/general/logout.php",
+], JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,821 +47,888 @@ $vc_links = json_encode([
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
-/* ── Reset & Tokens ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy:#1e2040;--indigo:#3730a3;--accent:#4f46e5;--a2:#7c3aed;
-  --light:#eef2ff;--green:#16a34a;--red:#dc2626;--amber:#d97706;
-  --bg:#f5f4ff;--card:#fff;--text:#1e2040;--muted:#6366a0;
-  --border:rgba(79,70,229,.13);--sh:0 4px 20px rgba(79,70,229,.08);
-  --sh-lg:0 16px 48px rgba(79,70,229,.14);--mono:'JetBrains Mono',monospace;
+  --navy:#1e2040;--purple:#353b69;--accent:#6470d2;--a2:#494788;
+  --light:#eef0ff;--green:#16a34a;--red:#dc2626;--amber:#d97706;
+  --bg:#f4f5fb;--card:#fff;--text:#1e2040;--muted:#6b7080;
+  --border:rgba(100,112,210,.13);--sh:0 4px 20px rgba(30,32,64,.08);
+  --sh-lg:0 16px 48px rgba(30,32,64,.13);--mono:'JetBrains Mono',monospace;
 }
 html{scroll-behavior:smooth}
 body{font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-body.hc-mode{filter:contrast(2) grayscale(.15)}
+body.hc{filter:contrast(1.9) grayscale(.1)}
 :focus-visible{outline:2.5px solid var(--accent);outline-offset:3px;border-radius:6px}
 
-/* ── Layout ── */
-.wrap{max-width:980px;margin:0 auto;padding:0 24px 72px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px 80px}
 
 /* ── Hero ── */
-.hero{
-  background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#4f46e5 100%);
-  margin:0 -24px;padding:38px 52px 46px;
-  color:#fff;position:relative;overflow:hidden;
-  border-radius:0 0 40px 40px
-}
+.hero{background:linear-gradient(135deg,var(--navy) 0%,#2d1b69 50%,var(--accent) 100%);margin:0 -24px;padding:38px 52px 46px;color:#fff;position:relative;overflow:hidden;border-radius:0 0 40px 40px}
 .hero-orb{position:absolute;border-radius:50%;pointer-events:none}
-.hero-orb-1{width:360px;height:360px;top:-150px;right:-100px;background:rgba(255,255,255,.04)}
-.hero-orb-2{width:190px;height:190px;bottom:-70px;left:4%;background:rgba(255,255,255,.03)}
+.hero-orb-1{width:380px;height:380px;top:-150px;right:-100px;background:rgba(255,255,255,.04)}
+.hero-orb-2{width:200px;height:200px;bottom:-80px;left:3%;background:rgba(255,255,255,.03)}
 .hero-inner{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap}
 .hero-text{flex:1;min-width:240px}
-.hero-back{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:9px 16px;border-radius:12px;
-  border:1.5px solid rgba(255,255,255,.3);
-  background:rgba(255,255,255,.1);color:#fff;
-  font-size:13px;font-weight:800;text-decoration:none;
-  margin-bottom:18px;transition:background .15s,transform .12s;
-  backdrop-filter:blur(8px)
-}
-.hero-back:hover{background:rgba(255,255,255,.18);transform:translateX(-2px)}
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.12);backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,.2);
-  border-radius:99px;padding:5px 14px;
-  font-size:12px;font-weight:800;letter-spacing:.06em;
-  text-transform:uppercase;margin-bottom:14px
-}
-.hero h1{font-size:clamp(24px,4vw,38px);font-weight:900;line-height:1.18;margin-bottom:10px}
-.hero-desc{font-size:15px;opacity:.78;max-width:520px;line-height:1.65;font-weight:600}
-.hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
-.hero-badge{
-  display:flex;align-items:center;gap:5px;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
-  border-radius:8px;padding:5px 12px;
-  font-size:12px;font-weight:700;color:rgba(255,255,255,.88)
-}
+.hero-back{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:12px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:13px;font-weight:800;text-decoration:none;margin-bottom:18px;transition:background .15s,transform .12s;backdrop-filter:blur(8px)}
+.hero-back:hover{background:rgba(255,255,255,.2);transform:translateX(-2px)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);font-size:10.5px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;margin-bottom:14px}
+.hero h1{font-size:clamp(24px,3.8vw,42px);font-weight:900;letter-spacing:-.8px;line-height:1.06;margin-bottom:12px}
+.hero h1 span{background:linear-gradient(90deg,#c4caff,#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:14px;font-weight:600;color:rgba(255,255,255,.78);line-height:1.75;max-width:520px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);font-size:11.5px;font-weight:800;color:rgba(255,255,255,.88)}
 
-/* ── Orb Animation ── */
-.voice-orb-wrap{
-  display:flex;align-items:center;justify-content:center;
-  width:130px;height:130px;flex-shrink:0
-}
-.voice-orb{
-  width:100px;height:100px;border-radius:50%;
-  background:rgba(255,255,255,.12);
-  border:2px solid rgba(255,255,255,.25);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;cursor:pointer;
-  transition:transform .2s
-}
-.voice-orb i{font-size:32px;color:#fff;transition:opacity .2s}
-.voice-orb::before,.voice-orb::after{
-  content:'';position:absolute;inset:-10px;
-  border-radius:50%;border:1.5px solid rgba(255,255,255,.15);
-  animation:orb-ring 2.5s ease-in-out infinite;
-}
-.voice-orb::after{inset:-20px;animation-delay:-.8s}
-.voice-orb.listening::before,.voice-orb.listening::after{
-  border-color:rgba(255,255,255,.4);
-  animation:orb-ring-active 1s ease-in-out infinite
-}
-@keyframes orb-ring{
-  0%,100%{transform:scale(1);opacity:.4}
-  50%{transform:scale(1.06);opacity:.8}
-}
-@keyframes orb-ring-active{
-  0%,100%{transform:scale(1);opacity:.6}
-  50%{transform:scale(1.14);opacity:1}
-}
-.voice-orb.listening{
-  background:rgba(255,255,255,.2);
-  box-shadow:0 0 40px rgba(255,255,255,.25),0 0 80px rgba(79,70,229,.5);
-  animation:orb-pulse .8s ease-in-out infinite
-}
-@keyframes orb-pulse{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.05)}
-}
-.voice-orb.speaking{
-  background:rgba(255,200,0,.15);
-  box-shadow:0 0 40px rgba(255,200,0,.2),0 0 80px rgba(255,150,0,.3)
-}
+/* ── Orb ── */
+.orb-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0}
+.voice-orb{width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;transition:box-shadow .3s,background .3s}
+.voice-orb i{font-size:32px;color:#fff}
+.voice-orb::before,.voice-orb::after{content:'';position:absolute;inset:-12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);animation:orbRing 2.5s ease-in-out infinite}
+.voice-orb::after{inset:-22px;animation-delay:-.8s}
+.voice-orb.listening{background:rgba(255,255,255,.22);box-shadow:0 0 40px rgba(255,255,255,.22),0 0 80px rgba(100,112,210,.5);animation:orbPulse .85s ease-in-out infinite}
+.voice-orb.listening::before,.voice-orb.listening::after{border-color:rgba(255,255,255,.45);animation:orbRingFast 1s ease-in-out infinite}
+.voice-orb.speaking{background:rgba(255,200,50,.15);box-shadow:0 0 40px rgba(255,200,0,.2)}
+@keyframes orbRing{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.06);opacity:.8}}
+@keyframes orbRingFast{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.14);opacity:1}}
+@keyframes orbPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.orb-hint{font-size:11px;font-weight:800;color:rgba(255,255,255,.55);text-align:center}
 
-/* ── Main card ── */
-.vc-main{
-  background:var(--card);border-radius:28px;
-  border:1px solid var(--border);box-shadow:var(--sh-lg);
-  margin-top:28px;overflow:hidden
-}
+/* ── Cards / Buttons (site-wide match) ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;box-shadow:var(--sh);overflow:hidden;margin-top:20px}
+.card-head{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card-head-icon{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--light);flex-shrink:0;color:var(--accent)}
+.card-head-title{font-size:15px;font-weight:900;color:var(--navy)}
+.card-head-sub{font-size:11.5px;font-weight:700;color:var(--muted);margin-top:1px}
+.card-body{padding:20px 22px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:13px;font-size:13.5px;font-weight:800;font-family:inherit;cursor:pointer;border:none;transition:all .18s;text-decoration:none;user-select:none}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--a2));color:#fff;box-shadow:0 4px 16px rgba(100,112,210,.25)}
+.btn-primary:hover{box-shadow:0 6px 24px rgba(100,112,210,.4);transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-secondary{background:var(--light);color:var(--accent);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:#e4e7ff;border-color:rgba(100,112,210,.3)}
+.btn-danger{background:#fef2f2;color:var(--red);border:1.5px solid rgba(220,38,38,.16)}
+.btn-danger:hover{background:#fee2e2}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:10px}
+.btn-mic{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;box-shadow:0 4px 16px rgba(220,38,38,.25)}
+.btn-mic:hover{box-shadow:0 6px 22px rgba(220,38,38,.38);transform:translateY(-1px)}
+.btn-mic.active{background:linear-gradient(135deg,#15803d,#16a34a);box-shadow:0 4px 16px rgba(22,163,74,.3);animation:micPulse 1.2s ease-in-out infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 4px 16px rgba(22,163,74,.3)}50%{box-shadow:0 6px 28px rgba(22,163,74,.55)}}
 
 /* ── Status bar ── */
-.vc-status{
-  display:flex;align-items:center;gap:12px;
-  padding:16px 26px;border-bottom:1px solid rgba(79,70,229,.07);
-  background:linear-gradient(90deg,rgba(79,70,229,.03),transparent)
-}
-.vc-status-dot{
-  width:10px;height:10px;border-radius:50%;
-  background:#d1d5db;flex-shrink:0;
-  transition:background .3s,box-shadow .3s
-}
-.vc-status-dot.idle{}
-.vc-status-dot.listening{
-  background:#22c55e;
-  box-shadow:0 0 0 3px rgba(34,197,94,.2);
-  animation:dot-pulse 1s infinite
-}
-.vc-status-dot.speaking{background:#f59e0b}
-.vc-status-dot.error{background:#ef4444}
-@keyframes dot-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
-.vc-status-label{font-size:13px;font-weight:800;color:var(--muted)}
-.vc-lang-chip{
-  margin-left:auto;font-size:11px;font-weight:700;
-  color:var(--accent);background:var(--light);
-  border-radius:8px;padding:3px 10px
-}
+.status-bar{display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--bg);border-radius:14px;border:1px solid var(--border);margin-bottom:14px}
+.status-dot{width:10px;height:10px;border-radius:50%;background:#94a3b8;flex-shrink:0;transition:background .3s}
+.status-dot.idle{}
+.status-dot.listening{background:#22c55e;animation:dotBlink 1s infinite}
+.status-dot.processing{background:var(--amber);animation:dotBlink .6s infinite}
+.status-dot.speaking{background:var(--accent)}
+.status-dot.executed{background:var(--green)}
+.status-dot.error{background:var(--red)}
+@keyframes dotBlink{0%,100%{opacity:1}50%{opacity:.2}}
+.status-label{font-size:13px;font-weight:800;color:var(--muted);flex:1}
+.lang-chip{margin-left:auto;font-size:11px;font-weight:700;background:var(--light);color:var(--accent);border-radius:7px;padding:3px 10px}
 
-/* ── Chat Area ── */
-.vc-chat{
-  padding:22px 24px;min-height:320px;max-height:420px;
-  overflow-y:auto;display:flex;flex-direction:column;gap:12px;
-  scroll-behavior:smooth
-}
-.vc-msg{
-  display:flex;gap:10px;align-items:flex-end;max-width:88%
-}
-.vc-msg.user{flex-direction:row-reverse;align-self:flex-end}
-.vc-msg.assistant{align-self:flex-start}
-.vc-avatar{
-  width:34px;height:34px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px
-}
-.vc-msg.user .vc-avatar{background:var(--light);color:var(--accent)}
-.vc-msg.assistant .vc-avatar{
-  background:linear-gradient(135deg,var(--accent),var(--a2));
-  color:#fff
-}
-.vc-bubble{
-  padding:11px 16px;border-radius:16px;
-  font-size:14px;font-weight:700;line-height:1.55;
-  max-width:100%
-}
-.vc-msg.user .vc-bubble{
-  background:var(--light);color:var(--navy);
-  border-bottom-right-radius:4px
-}
-.vc-msg.assistant .vc-bubble{
-  background:linear-gradient(135deg,var(--accent),var(--a2));
-  color:#fff;
-  border-bottom-left-radius:4px
-}
-.vc-bubble.system{
-  background:#fef9c3;color:#78350f;
-  border:1px solid rgba(250,204,21,.3)
-}
-.vc-typing{
-  display:flex;align-items:center;gap:5px;
-  padding:13px 16px
-}
-.vc-typing span{
-  width:7px;height:7px;border-radius:50%;
-  background:rgba(255,255,255,.5);
-  animation:typing .9s ease-in-out infinite
-}
-.vc-typing span:nth-child(2){animation-delay:.2s}
-.vc-typing span:nth-child(3){animation-delay:.4s}
-@keyframes typing{0%,80%,100%{transform:scale(0.8);opacity:.5}40%{transform:scale(1.1);opacity:1}}
+/* ── Chat ── */
+.chat-box{min-height:300px;max-height:420px;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.msg{display:flex;gap:9px;align-items:flex-end;max-width:88%}
+.msg.user{flex-direction:row-reverse;align-self:flex-end}
+.msg.assistant{align-self:flex-start}
+.msg-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px}
+.msg.user .msg-avatar{background:var(--light);color:var(--accent)}
+.msg.assistant .msg-avatar{background:linear-gradient(135deg,var(--accent),var(--a2));color:#fff}
+.msg-bubble{padding:10px 15px;border-radius:16px;font-size:14px;font-weight:700;line-height:1.55;max-width:100%}
+.msg.user .msg-bubble{background:var(--light);color:var(--navy);border-bottom-right-radius:4px}
+.msg.assistant .msg-bubble{background:linear-gradient(135deg,var(--accent),var(--a2));color:#fff;border-bottom-left-radius:4px}
+.msg.assistant .msg-bubble.system{background:#fef9c3;color:#78350f}
 
-/* ── Input area ── */
-.vc-input-area{
-  border-top:1px solid rgba(79,70,229,.07);
-  padding:16px 24px;display:flex;gap:10px;align-items:center
-}
-#vcTextInput{
-  flex:1;padding:12px 18px;
-  border:1.5px solid rgba(79,70,229,.2);
-  border-radius:14px;font-size:14px;font-weight:700;
-  font-family:inherit;color:var(--text);
-  background:#fafafe;outline:none;
-  transition:border-color .18s
-}
-#vcTextInput:focus{border-color:var(--accent);background:#fff}
-#vcTextInput::placeholder{color:var(--muted);opacity:.6}
-.vc-send-btn{
-  width:44px;height:44px;border-radius:13px;border:none;cursor:pointer;
-  background:var(--accent);color:#fff;font-size:16px;
-  display:flex;align-items:center;justify-content:center;
-  transition:transform .15s,background .18s
-}
-.vc-send-btn:hover{background:var(--indigo);transform:scale(1.06)}
+/* ── Input row ── */
+.input-row{display:flex;gap:8px;padding:14px 18px;border-top:1px solid var(--border)}
+#textInput{flex:1;padding:11px 16px;border:1.5px solid var(--border);border-radius:13px;font-size:14px;font-weight:700;font-family:inherit;color:var(--text);background:var(--bg);outline:none;transition:border-color .18s}
+#textInput:focus{border-color:var(--accent);background:#fff}
+#textInput::placeholder{color:var(--muted);opacity:.6}
+.send-btn{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background .18s,transform .15s}
+.send-btn:hover{background:var(--a2);transform:scale(1.06)}
 
-/* ── Control Buttons ── */
-.vc-controls{
-  display:flex;gap:10px;padding:16px 24px 22px;
-  flex-wrap:wrap;border-top:1px solid rgba(79,70,229,.07)
-}
-.btn{
-  display:inline-flex;align-items:center;gap:7px;
-  padding:11px 20px;border-radius:13px;
-  font-size:14px;font-weight:800;font-family:inherit;
-  cursor:pointer;border:none;transition:all .18s;text-decoration:none
-}
-.btn-primary{
-  background:linear-gradient(135deg,var(--accent),var(--a2));
-  color:#fff;box-shadow:0 4px 16px rgba(79,70,229,.25)
-}
-.btn-primary:hover{box-shadow:0 6px 24px rgba(79,70,229,.4);transform:translateY(-1px)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.btn-secondary{background:var(--light);color:var(--accent);border:1.5px solid rgba(79,70,229,.18)}
-.btn-secondary:hover{background:#e0e7ff;border-color:rgba(79,70,229,.38)}
-.btn-mic{
-  background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;
-  box-shadow:0 4px 16px rgba(220,38,38,.25)
-}
-.btn-mic:hover{box-shadow:0 6px 22px rgba(220,38,38,.38);transform:translateY(-1px)}
-.btn-mic.listening{
-  background:linear-gradient(135deg,#16a34a,#22c55e);
-  box-shadow:0 4px 16px rgba(22,163,74,.3);
-  animation:btn-pulse 1.2s ease-in-out infinite
-}
-@keyframes btn-pulse{
-  0%,100%{box-shadow:0 4px 16px rgba(22,163,74,.3)}
-  50%{box-shadow:0 6px 28px rgba(22,163,74,.55)}
-}
+/* ── Controls ── */
+.controls-row{display:flex;gap:8px;padding:14px 18px 18px;flex-wrap:wrap;border-top:1px solid var(--border)}
 
-/* ── Command Quick-Grid ── */
-.cmd-section{margin-top:28px}
-.cmd-section-title{
-  font-size:16px;font-weight:900;color:var(--navy);
-  margin-bottom:14px;display:flex;align-items:center;gap:8px
-}
-.cmd-section-title i{color:var(--accent);font-size:14px}
-.cmd-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:10px
-}
-.cmd-chip{
-  background:var(--card);border:1.5px solid var(--border);
-  border-radius:14px;padding:13px 16px;
-  cursor:pointer;display:flex;align-items:center;gap:10px;
-  font-size:13px;font-weight:800;color:var(--navy);
-  transition:background .18s,border-color .18s,transform .12s;
-  user-select:none
-}
-.cmd-chip:hover{
-  background:var(--light);
-  border-color:rgba(79,70,229,.35);
-  transform:translateY(-1px)
-}
-.cmd-chip i{
-  width:28px;height:28px;border-radius:9px;
-  background:var(--light);color:var(--accent);
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;flex-shrink:0
-}
+/* ── Language selector ── */
+.lang-select-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 18px;border-top:1px solid var(--border);background:rgba(100,112,210,.02)}
+.lang-select-lbl{font-size:13px;font-weight:800;color:var(--navy)}
+.lang-sel{padding:7px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:700;font-family:inherit;color:var(--navy);background:var(--card);cursor:pointer;outline:none}
+.lang-sel:focus{border-color:var(--accent)}
 
-/* ── Accessibility settings card ── */
-.a11y-card{
-  background:var(--card);border-radius:22px;
-  border:1px solid var(--border);box-shadow:var(--sh);
-  padding:24px 26px;margin-top:20px
-}
-.a11y-card-title{
-  font-size:14px;font-weight:900;color:var(--navy);
-  display:flex;align-items:center;gap:8px;margin-bottom:16px;
-  text-transform:uppercase;letter-spacing:.04em
-}
-.a11y-card-title i{color:var(--accent)}
-.a11y-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 0;border-bottom:1px solid rgba(79,70,229,.06)
-}
+/* ── Transcript ── */
+.transcript-box{background:var(--bg);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--muted);min-height:36px;border:1px solid var(--border);font-family:var(--mono)}
+.transcript-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+
+/* ── Command log ── */
+.cmd-log{display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto}
+.cmd-log-item{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg)}
+.cli-said{font-size:13px;font-weight:700;color:var(--navy)}
+.cli-intent{font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;background:var(--light);color:var(--accent)}
+.cli-result{font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px}
+.cli-result.ok{background:rgba(22,163,74,.1);color:var(--green)}
+.cli-result.fail{background:rgba(220,38,38,.1);color:var(--red)}
+.cmd-log-empty{font-size:13px;font-weight:700;color:var(--muted);opacity:.55;text-align:center;padding:24px}
+
+/* ── Quick commands ── */
+.cmd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.cmd-chip{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:11px 14px;cursor:pointer;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:var(--navy);transition:background .18s,border-color .18s,transform .12s;user-select:none}
+.cmd-chip:hover{background:var(--light);border-color:rgba(100,112,210,.3);transform:translateY(-1px)}
+.cmd-chip-icon{font-size:16px;color:var(--accent)}
+.cmd-chip-en{font-size:11px;font-weight:700;color:var(--muted)}
+.cmd-chip-ar{font-size:11px;font-weight:700;color:var(--amber);direction:rtl}
+
+/* ── a11y settings ── */
+.a11y-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(100,112,210,.07)}
 .a11y-row:last-child{border-bottom:none}
-.a11y-row-label{
-  display:flex;align-items:center;gap:10px;
-  font-size:14px;font-weight:700;color:var(--navy)
-}
-.a11y-row-label i{color:var(--muted);width:18px}
-.a11y-row-controls{display:flex;gap:6px;align-items:center}
-.a11y-toggle{
-  width:44px;height:24px;border-radius:99px;
-  border:none;cursor:pointer;position:relative;
-  background:#d1d5db;transition:background .22s
-}
-.a11y-toggle.on{background:var(--accent)}
-.a11y-toggle::after{
-  content:'';position:absolute;
-  top:3px;left:3px;
-  width:18px;height:18px;border-radius:50%;
-  background:#fff;transition:transform .22s;
-  box-shadow:0 1px 4px rgba(0,0,0,.2)
-}
-.a11y-toggle.on::after{transform:translateX(20px)}
-.font-ctrl{display:flex;align-items:center;gap:4px}
-.font-btn{
-  width:30px;height:30px;border:1.5px solid var(--border);
-  border-radius:9px;background:var(--light);
-  color:var(--accent);font-size:13px;font-weight:900;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:background .15s
-}
-.font-btn:hover{background:#e0e7ff}
-.font-size-val{
-  font-size:13px;font-weight:800;color:var(--muted);
-  min-width:32px;text-align:center;font-family:var(--mono)
-}
+.a11y-label{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;color:var(--navy)}
+.a11y-label i{color:var(--muted);width:16px}
+.toggle-cb{width:38px;height:22px;border-radius:99px;border:none;cursor:pointer;position:relative;background:#d1d5db;transition:background .2s;flex-shrink:0}
+.toggle-cb.on{background:var(--accent)}
+.toggle-cb::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle-cb.on::after{transform:translateX(16px)}
+.font-row{display:flex;align-items:center;gap:6px}
+.font-btn{width:30px;height:30px;border:1.5px solid var(--border);border-radius:9px;background:var(--light);color:var(--accent);font-size:13px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.font-btn:hover{background:#e4e7ff}
+.font-val{font-size:12px;font-weight:800;color:var(--muted);min-width:30px;text-align:center;font-family:var(--mono)}
 
-/* ── Browser support banner ── */
-.support-banner{
-  background:#fef3c7;border:1.5px solid rgba(245,158,11,.25);
-  border-radius:14px;padding:14px 18px;
-  font-size:13px;font-weight:700;color:#78350f;
-  display:none;align-items:center;gap:10px;margin-top:16px
-}
-.support-banner i{font-size:18px;color:#d97706}
-.support-banner.visible{display:flex}
+/* ── No-support banner ── */
+.no-support{background:#fef3c7;border:1.5px solid rgba(245,158,11,.25);border-radius:14px;padding:14px 18px;font-size:13px;font-weight:700;color:#78350f;display:none;align-items:center;gap:10px;margin-top:16px}
+.no-support i{font-size:18px;color:#d97706}
+.no-support.show{display:flex}
+
+/* ── Toast ── */
+#toast{position:fixed;bottom:28px;right:28px;z-index:8000;background:var(--navy);color:#fff;font-size:13px;font-weight:800;padding:12px 20px;border-radius:13px;box-shadow:0 8px 30px rgba(0,0,0,.2);display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:600px){.hero{padding:28px 22px 36px}}
 </style>
 </head>
 <body>
 
+<div id="toast"><i class="fa-solid fa-check"></i> <span id="toastMsg">Done</span></div>
+
 <div class="wrap">
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-orb hero-orb-1"></div>
-    <div class="hero-orb hero-orb-2"></div>
-    <div class="hero-inner">
-      <div class="hero-text">
-        <a href="<?= htmlspecialchars($back_link) ?>" class="hero-back">
-          <i class="fa-solid fa-arrow-left"></i> Back
-        </a>
-        <div class="hero-eyebrow">
-          <i class="fa-solid fa-microphone-lines"></i> Accessibility Feature
-        </div>
-        <h1>AI Voice Companion</h1>
-        <p class="hero-desc">
-          Navigate Rafiq entirely with your voice. Say a command, ask for help, control accessibility settings, and get spoken responses — no touch required.
-        </p>
-        <div class="hero-badges">
-          <span class="hero-badge"><i class="fa-solid fa-microphone"></i> Voice Commands</span>
-          <span class="hero-badge"><i class="fa-solid fa-volume-high"></i> Spoken Responses</span>
-          <span class="hero-badge"><i class="fa-solid fa-universal-access"></i> Fully Accessible</span>
-          <span class="hero-badge"><i class="fa-solid fa-lock"></i> On-Device AI</span>
-        </div>
-      </div>
-      <div class="voice-orb-wrap">
-        <div class="voice-orb" id="voiceOrb">
-          <i class="fa-solid fa-microphone" id="orbIcon"></i>
-        </div>
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-orb hero-orb-1"></div><div class="hero-orb hero-orb-2"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <a href="<?= htmlspecialchars($back_link) ?>" class="hero-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+      <div class="hero-badge"><i class="fa-solid fa-microphone-lines"></i> Accessibility Feature</div>
+      <h1>AI <span>Voice Companion</span></h1>
+      <p>Navigate Rafiq with your voice — in English, Arabic, or Franco Arabic. Say a command and I'll take you there.</p>
+      <div class="hero-tags">
+        <span class="hero-tag"><i class="fa-solid fa-microphone"></i> Voice Commands</span>
+        <span class="hero-tag"><i class="fa-solid fa-language"></i> English + Arabic + Franco</span>
+        <span class="hero-tag"><i class="fa-solid fa-volume-high"></i> Voice Responses</span>
+        <span class="hero-tag"><i class="fa-solid fa-universal-access"></i> Hands-Free</span>
       </div>
     </div>
+    <div class="orb-wrap">
+      <div class="voice-orb" id="voiceOrb"><i class="fa-solid fa-microphone" id="orbIco"></i></div>
+      <div class="orb-hint">Click to speak</div>
+    </div>
+  </div>
+</div>
+
+<!-- No support banner -->
+<div class="no-support" id="noSupport">
+  <i class="fa-solid fa-triangle-exclamation"></i>
+  <span>Your browser does not support the Web Speech API. Please use Google Chrome or Microsoft Edge for voice input.</span>
+</div>
+
+<!-- Main card: chat -->
+<div class="card" style="margin-top:28px">
+  <div class="card-head">
+    <div class="card-head-icon"><i class="fa-solid fa-comments"></i></div>
+    <div><div class="card-head-title">Voice Chat</div><div class="card-head-sub">Speak or type a command</div></div>
   </div>
 
-  <!-- Browser support banner -->
-  <div class="support-banner" id="supportBanner">
-    <i class="fa-solid fa-triangle-exclamation"></i>
-    <span>Your browser does not fully support the Web Speech API. Voice input may not work. Please use Google Chrome or Microsoft Edge for the best experience.</span>
+  <!-- Language selector -->
+  <div class="lang-select-row">
+    <span class="lang-select-lbl"><i class="fa-solid fa-language"></i> Recognition language:</span>
+    <select class="lang-sel" id="langSel">
+      <option value="en-US" selected>English (US)</option>
+      <option value="ar-EG">Arabic — Egyptian (ar-EG)</option>
+      <option value="ar-SA">Arabic — Standard (ar-SA)</option>
+      <option value="auto">Auto-detect</option>
+    </select>
+    <span style="font-size:12px;font-weight:700;color:var(--muted)">Current: <span id="langChip" style="color:var(--accent)">English</span></span>
   </div>
 
-  <!-- Main Card -->
-  <div class="vc-main">
-
-    <!-- Status bar -->
-    <div class="vc-status">
-      <div class="vc-status-dot idle" id="statusDot"></div>
-      <span class="vc-status-label" id="statusLabel">Ready — click Speak or type a command</span>
-      <span class="vc-lang-chip">EN — US</span>
-    </div>
-
-    <!-- Chat -->
-    <div class="vc-chat" id="vcChat">
-      <!-- Initial greeting injected by JS -->
-    </div>
-
-    <!-- Text input -->
-    <div class="vc-input-area">
-      <input type="text" id="vcTextInput" placeholder="Type a command or question..." autocomplete="off">
-      <button class="vc-send-btn" id="vcSendBtn" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
-    </div>
-
-    <!-- Controls -->
-    <div class="vc-controls">
-      <button class="btn btn-mic" id="micBtn">
-        <i class="fa-solid fa-microphone" id="micIcon"></i>
-        <span id="micLabel">Start Listening</span>
-      </button>
-      <button class="btn btn-secondary" id="stopSpeakBtn">
-        <i class="fa-solid fa-stop"></i> Stop Speaking
-      </button>
-      <button class="btn btn-secondary" id="clearChatBtn">
-        <i class="fa-solid fa-broom"></i> Clear Chat
-      </button>
+  <!-- Status bar -->
+  <div style="padding:0 18px 0">
+    <div class="status-bar" id="statusBar">
+      <div class="status-dot idle" id="statusDot"></div>
+      <span class="status-label" id="statusLabel">Ready — click microphone or type a command</span>
+      <span class="lang-chip" id="statusLangChip">EN</span>
     </div>
   </div>
 
-  <!-- Quick commands -->
-  <div class="cmd-section">
-    <div class="cmd-section-title">
-      <i class="fa-solid fa-bolt"></i> Quick Voice Commands — click to run
-    </div>
-    <div class="cmd-grid" id="cmdGrid">
-      <!-- injected by JS -->
-    </div>
+  <!-- Live transcript -->
+  <div style="padding:0 18px 12px">
+    <div class="transcript-label">What I heard:</div>
+    <div class="transcript-box" id="transcriptBox">—</div>
   </div>
 
-  <!-- Accessibility Card -->
-  <div class="a11y-card">
-    <div class="a11y-card-title">
-      <i class="fa-solid fa-universal-access"></i> Accessibility Settings
+  <!-- Chat messages -->
+  <div class="chat-box" id="chatBox"></div>
+
+  <!-- Text input -->
+  <div class="input-row">
+    <input type="text" id="textInput" placeholder="Type a command or question..." autocomplete="off">
+    <button class="send-btn" id="sendBtn" title="Send"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-row">
+    <button class="btn btn-mic" id="micBtn"><i class="fa-solid fa-microphone" id="micIco"></i> <span id="micLbl">Start Listening</span></button>
+    <button class="btn btn-secondary" id="stopSpeakBtn"><i class="fa-solid fa-stop"></i> Stop Speaking</button>
+    <button class="btn btn-secondary" id="clearChatBtn"><i class="fa-solid fa-broom"></i> Clear Chat</button>
+  </div>
+</div>
+
+<!-- Quick commands -->
+<div class="card">
+  <div class="card-head">
+    <div class="card-head-icon"><i class="fa-solid fa-bolt"></i></div>
+    <div><div class="card-head-title">Quick Commands</div><div class="card-head-sub">Click any command to run it</div></div>
+  </div>
+  <div class="card-body">
+    <div class="cmd-grid" id="cmdGrid"></div>
+  </div>
+</div>
+
+<!-- Command log -->
+<div class="card">
+  <div class="card-head">
+    <div class="card-head-icon"><i class="fa-solid fa-list-check"></i></div>
+    <div><div class="card-head-title">Command Log</div><div class="card-head-sub">What you said, intent detected, action taken</div></div>
+  </div>
+  <div class="card-body">
+    <div class="cmd-log" id="cmdLog">
+      <div class="cmd-log-empty">No commands yet</div>
+    </div>
+  </div>
+</div>
+
+<!-- Accessibility settings -->
+<div class="card">
+  <div class="card-head">
+    <div class="card-head-icon"><i class="fa-solid fa-universal-access"></i></div>
+    <div><div class="card-head-title">Accessibility Settings</div><div class="card-head-sub">Also controllable by voice</div></div>
+  </div>
+  <div class="card-body">
+    <div class="a11y-row">
+      <div class="a11y-label"><i class="fa-solid fa-circle-half-stroke"></i> High Contrast Mode</div>
+      <button class="toggle-cb" id="hcToggle" aria-label="High contrast"></button>
     </div>
     <div class="a11y-row">
-      <div class="a11y-row-label"><i class="fa-solid fa-circle-half-stroke"></i> High Contrast Mode</div>
-      <div class="a11y-row-controls">
-        <button class="a11y-toggle" id="hcToggle" aria-label="Toggle High Contrast"></button>
+      <div class="a11y-label"><i class="fa-solid fa-text-height"></i> Font Size</div>
+      <div class="font-row">
+        <button class="font-btn" id="fontDec">−</button>
+        <span class="font-val" id="fontVal">16px</span>
+        <button class="font-btn" id="fontInc">+</button>
       </div>
     </div>
     <div class="a11y-row">
-      <div class="a11y-row-label"><i class="fa-solid fa-text-height"></i> Font Size</div>
-      <div class="a11y-row-controls">
-        <div class="font-ctrl">
-          <button class="font-btn" id="fontDecBtn">−</button>
-          <span class="font-size-val" id="fontSizeVal">16px</span>
-          <button class="font-btn" id="fontIncBtn">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="a11y-row">
-      <div class="a11y-row-label"><i class="fa-solid fa-volume-high"></i> Read Responses Aloud</div>
-      <div class="a11y-row-controls">
-        <button class="a11y-toggle on" id="ttsToggle" aria-label="Toggle TTS"></button>
-      </div>
+      <div class="a11y-label"><i class="fa-solid fa-volume-high"></i> Speak Responses Aloud</div>
+      <button class="toggle-cb on" id="ttsToggle" aria-label="TTS"></button>
     </div>
   </div>
+</div>
 
-</div><!-- /wrap -->
+</div>
 
 <script>
-// ── Links injected from PHP ──
-const LINKS = <?= $vc_links ?>;
-const BASE  = '<?= $_base ?>';
+'use strict';
 
-// ── State ──
+/* ══════════════════════════════════════════════
+   CONFIG — PHP-injected links
+══════════════════════════════════════════════ */
+const LINKS = <?= $vc_links ?>;
+
+/* ══════════════════════════════════════════════
+   INTENT DATABASE
+   Three keys per intent: en, ar, franco
+   All entries are KEYWORDS (partial match OK)
+══════════════════════════════════════════════ */
+const INTENTS = [
+  {
+    id: 'go_home',
+    icon: 'fa-house',
+    label: 'Go Home',
+    en:     ['go home','open home','home page','homepage','main page','go to home'],
+    ar:     ['الرئيسية','الصفحة الرئيسية','الهوم','افتح الرئيسية','ارجع للرئيسية','روح الرئيسية'],
+    franco: ['el home','el raesiya','eftah home','eftah el home','el raisia','roo7 home'],
+    action: () => navigate(LINKS.home),
+    response: { en: 'Opening the home page.', ar: 'جاري فتح الصفحة الرئيسية.' }
+  },
+  {
+    id: 'open_bookings',
+    icon: 'fa-calendar-check',
+    label: 'My Bookings',
+    en:     ['my bookings','open bookings','bookings','my appointments','open appointments'],
+    ar:     ['حجوزاتي','افتح الحجوزات','الحجوزات','مواعيدي'],
+    franco: ['7agozaty','bookings','el 7agozat','mawa3edy','eftah bookings'],
+    action: () => navigate(LINKS.bookings),
+    response: { en: 'Opening your bookings.', ar: 'جاري فتح الحجوزات.' }
+  },
+  {
+    id: 'open_profile',
+    icon: 'fa-circle-user',
+    label: 'My Profile',
+    en:     ['my profile','open profile','profile page','account'],
+    ar:     ['ملفي الشخصي','الملف الشخصي','افتح البروفايل','حسابي'],
+    franco: ['profile','el profile','7esaby','eftah profile','profaili'],
+    action: () => navigate(LINKS.profile),
+    response: { en: 'Opening your profile.', ar: 'جاري فتح الملف الشخصي.' }
+  },
+  {
+    id: 'open_map',
+    icon: 'fa-map',
+    label: 'Open Map',
+    en:     ['open map','go to map','show map','map'],
+    ar:     ['افتح الخريطة','الخريطة','خريطة'],
+    franco: ['el map','eftah el map','eftah map','el kharita'],
+    action: () => navigate(LINKS.map),
+    response: { en: 'Opening the map.', ar: 'جاري فتح الخريطة.' }
+  },
+  {
+    id: 'open_sign_language',
+    icon: 'fa-hands',
+    label: 'Sign Language AI',
+    en:     ['sign language','sign language ai','open sign language','asl','hand signs','open asl'],
+    ar:     ['لغة الإشارة','افتح لغة الإشارة','اشارة','فتح لغة الاشارة'],
+    franco: ['sign language','lughet el ishara','eftah sign','eftah sign language','el isharah'],
+    action: () => navigate(LINKS.sl),
+    response: { en: 'Opening Sign Language AI.', ar: 'جاري فتح مساعد لغة الإشارة.' }
+  },
+  {
+    id: 'open_ocr',
+    icon: 'fa-eye',
+    label: 'OCR Reader',
+    en:     ['ocr','ocr reader','open ocr','smart reader','read image','scan text','text reader'],
+    ar:     ['قارئ النصوص','افتح قارئ النصوص','ocr','اقرأ صورة','مسح النص'],
+    franco: ['ocr','eftah ocr','el ocr','reader','el qare2','kare2 nosoos'],
+    action: () => navigate(LINKS.ocr),
+    response: { en: 'Opening the Smart OCR Reader.', ar: 'جاري فتح قارئ النصوص.' }
+  },
+  {
+    id: 'open_voice',
+    icon: 'fa-microphone',
+    label: 'Voice Companion',
+    en:     ['voice companion','open voice','voice ai'],
+    ar:     ['المساعد الصوتي','افتح المساعد الصوتي','مساعد صوتي'],
+    franco: ['voice','el voice','mosa3ed soty','eftah voice'],
+    action: () => { addBubble("You're already on the Voice Companion page!", 'assistant'); return null; },
+    response: { en: "You're already here!", ar: 'أنت بالفعل على هذه الصفحة!' }
+  },
+  {
+    id: 'high_contrast_on',
+    icon: 'fa-circle-half-stroke',
+    label: 'High Contrast ON',
+    en:     ['high contrast','turn on high contrast','enable high contrast','contrast on','dark mode'],
+    ar:     ['شغل التباين العالي','تباين عالي','وضع التباين','فعل التباين'],
+    franco: ['high contrast','sha8al contrast','sha8el contrast','eftah contrast','3aly contrast'],
+    action: () => setHighContrast(true),
+    response: { en: 'High contrast enabled.', ar: 'تم تفعيل التباين العالي.' }
+  },
+  {
+    id: 'high_contrast_off',
+    icon: 'fa-sun',
+    label: 'High Contrast OFF',
+    en:     ['turn off high contrast','disable high contrast','contrast off','normal mode'],
+    ar:     ['اقفل التباين','وقف التباين','ألغي التباين'],
+    franco: ['e2fel contrast','wa2af contrast','2efl high contrast','normal mode'],
+    action: () => setHighContrast(false),
+    response: { en: 'High contrast disabled.', ar: 'تم إيقاف التباين العالي.' }
+  },
+  {
+    id: 'font_increase',
+    icon: 'fa-text-height',
+    label: 'Bigger Text',
+    en:     ['increase text','bigger text','larger text','increase font','zoom in text','make bigger','font up','text up'],
+    ar:     ['كبر الخط','كبر الكلام','زود حجم الخط','خط أكبر'],
+    franco: ['kbr el font','kaber font','kbar el kalam','zawed font','font akbar','text akbar'],
+    action: () => changeFontSize(2),
+    response: { en: 'Text size increased.', ar: 'تم تكبير الخط.' }
+  },
+  {
+    id: 'font_decrease',
+    icon: 'fa-text-height',
+    label: 'Smaller Text',
+    en:     ['decrease text','smaller text','reduce font','font down','text down','make smaller','zoom out text'],
+    ar:     ['صغر الخط','قلل حجم الخط','خط أصغر'],
+    franco: ['soghar el font','so8ar font','so8har kalam','qalel font','font as8ar'],
+    action: () => changeFontSize(-2),
+    response: { en: 'Text size decreased.', ar: 'تم تصغير الخط.' }
+  },
+  {
+    id: 'font_reset',
+    icon: 'fa-rotate',
+    label: 'Reset Text Size',
+    en:     ['reset text','reset font','default font','normal text'],
+    ar:     ['رجع الخط الطبيعي','الخط الافتراضي'],
+    franco: ['reset font','raga3 font','default'],
+    action: () => { fontSize=16; applyFont(); },
+    response: { en: 'Font size reset to default.', ar: 'تم إعادة الخط للوضع الطبيعي.' }
+  },
+  {
+    id: 'read_page',
+    icon: 'fa-volume-high',
+    label: 'Read Page',
+    en:     ['read page','read this page','read aloud','speak page','read screen'],
+    ar:     ['اقرأ الصفحة','اقرأ هذه الصفحة','قراءة الصفحة','اقرأ الشاشة'],
+    franco: ['e2ra el page','e2ra el saf7a','e2ra','read el page','kalam el page'],
+    action: () => readPageContent(),
+    response: { en: 'Reading the page aloud.', ar: 'جاري قراءة الصفحة.' }
+  },
+  {
+    id: 'stop_reading',
+    icon: 'fa-stop',
+    label: 'Stop Reading',
+    en:     ['stop reading','stop speaking','stop talking','quiet','silence','shut up'],
+    ar:     ['وقف القراءة','اسكت','وقف الكلام','اصمت'],
+    franco: ['wa2af','stop','wa2af el kalam','oske t','wa2af e2ra'],
+    action: () => { window.speechSynthesis.cancel(); },
+    response: { en: 'Stopped.', ar: 'توقف.', speak: false }
+  },
+  {
+    id: 'logout',
+    icon: 'fa-right-from-bracket',
+    label: 'Logout',
+    en:     ['logout','log out','sign out','exit'],
+    ar:     ['تسجيل الخروج','اخرج','اطلع'],
+    franco: ['logout','te5rog','et2al3','ta5rog','5rog'],
+    action: () => navigate(LINKS.logout),
+    response: { en: 'Logging out. Goodbye!', ar: 'جاري تسجيل الخروج. مع السلامة!' }
+  },
+  {
+    id: 'help',
+    icon: 'fa-circle-question',
+    label: 'Help',
+    en:     ['help','what can you do','what commands','commands','options','guide'],
+    ar:     ['ساعدني','مساعدة','إيه اللي تقدر تعمله','اوامر'],
+    franco: ['sa3edny','mosa3da','help','eh el awamir','commands'],
+    action: () => showHelp(),
+    response: null
+  },
+  {
+    id: 'greeting',
+    icon: 'fa-hand-wave',
+    label: 'Greeting',
+    en:     ['hello','hi','hey','good morning','good evening','good afternoon','salam'],
+    ar:     ['السلام عليكم','مرحبا','اهلا','صباح الخير','مساء الخير'],
+    franco: ['salam','ahlan','marhaba','alo','sabah el kheir','masa el kheir'],
+    action: () => showGreeting(),
+    response: null
+  },
+];
+
+/* ══════════════════════════════════════════════
+   TEXT NORMALISATION
+══════════════════════════════════════════════ */
+function normalize(text) {
+  let t = (text || '').toLowerCase();
+  // Remove Arabic diacritics
+  t = t.replace(/[ً-ٰٟـ]/g, '');
+  // Normalise Arabic letters (أ إ آ → ا, ة → ه, ى → ي)
+  t = t.replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
+  // Franco/common substitutions
+  t = t.replace(/3/g, 'ع').replace(/7/g, 'ح').replace(/2/g, 'ء').replace(/5/g, 'خ').replace(/8/g, 'غ').replace(/9/g, 'ق').replace(/0/g, 'ض');
+  // Remove punctuation, collapse spaces
+  t = t.replace(/[^؀-ۿa-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  return t;
+}
+
+function matchIntent(raw) {
+  const norm = normalize(raw);
+  // Check all intents, return highest scoring match
+  let best = null, bestScore = 0;
+  for(const intent of INTENTS) {
+    for(const lang of ['en','ar','franco']) {
+      for(const kw of (intent[lang]||[])) {
+        const nkw = normalize(kw);
+        if(norm.includes(nkw) || nkw.includes(norm)) {
+          const score = nkw.length; // longer match = more specific
+          if(score > bestScore) { bestScore = score; best = intent; }
+        }
+      }
+    }
+  }
+  return best;
+}
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
 let recognizing = false;
 let recognition = null;
 let ttsEnabled  = true;
 let hcOn        = false;
 let fontSize    = 16;
+const hasSR     = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+
+/* ══════════════════════════════════════════════
+   DOM
+══════════════════════════════════════════════ */
 const $ = id => document.getElementById(id);
+const D = {
+  voiceOrb:$('voiceOrb'), orbIco:$('orbIco'),
+  statusDot:$('statusDot'), statusLabel:$('statusLabel'), statusLangChip:$('statusLangChip'),
+  chatBox:$('chatBox'), textInput:$('textInput'), sendBtn:$('sendBtn'),
+  micBtn:$('micBtn'), micIco:$('micIco'), micLbl:$('micLbl'),
+  stopSpeakBtn:$('stopSpeakBtn'), clearChatBtn:$('clearChatBtn'),
+  langSel:$('langSel'), langChip:$('langChip'),
+  transcriptBox:$('transcriptBox'),
+  cmdGrid:$('cmdGrid'), cmdLog:$('cmdLog'),
+  hcToggle:$('hcToggle'), ttsToggle:$('ttsToggle'),
+  fontDec:$('fontDec'), fontInc:$('fontInc'), fontVal:$('fontVal'),
+  noSupport:$('noSupport'),
+  toast:$('toast'), toastMsg:$('toastMsg'),
+};
 
-// ── DOM refs ──
-const voiceOrb    = $('voiceOrb');
-const orbIcon     = $('orbIcon');
-const statusDot   = $('statusDot');
-const statusLabel = $('statusLabel');
-const vcChat      = $('vcChat');
-const vcTextInput = $('vcTextInput');
-const vcSendBtn   = $('vcSendBtn');
-const micBtn      = $('micBtn');
-const micIcon     = $('micIcon');
-const micLabel    = $('micLabel');
-const stopSpeakBtn= $('stopSpeakBtn');
-const clearChatBtn= $('clearChatBtn');
-const cmdGrid     = $('cmdGrid');
-const hcToggle    = $('hcToggle');
-const ttsToggle   = $('ttsToggle');
-const fontDecBtn  = $('fontDecBtn');
-const fontIncBtn  = $('fontIncBtn');
-const fontSizeVal = $('fontSizeVal');
-const supportBanner=$('supportBanner');
-
-// ── Quick commands ──
-const COMMANDS = [
-    { icon:'fa-house',          label:'Go Home',             phrase:'go home' },
-    { icon:'fa-calendar-check', label:'My Bookings',         phrase:'open my bookings' },
-    { icon:'fa-circle-user',    label:'My Profile',          phrase:'open profile' },
-    { icon:'fa-hands',          label:'Sign Language AI',    phrase:'open sign language' },
-    { icon:'fa-eye',            label:'OCR Reader',          phrase:'open ocr reader' },
-    { icon:'fa-circle-half-stroke', label:'High Contrast',  phrase:'toggle high contrast' },
-    { icon:'fa-text-height',    label:'Increase Text',       phrase:'increase text size' },
-    { icon:'fa-text-height',    label:'Decrease Text',       phrase:'decrease text size' },
-    { icon:'fa-volume-high',    label:'Read This Page',      phrase:'read page' },
-    { icon:'fa-circle-question',label:'Help',                phrase:'help' },
-    { icon:'fa-right-from-bracket', label:'Logout',         phrase:'logout' },
+/* ══════════════════════════════════════════════
+   QUICK COMMAND CHIPS
+══════════════════════════════════════════════ */
+const QUICK = [
+  { icon:'fa-house',        en:'Open Home',         ar:'افتح الرئيسية',    phrase:'go home' },
+  { icon:'fa-calendar',     en:'My Bookings',        ar:'حجوزاتي',         phrase:'open bookings' },
+  { icon:'fa-map',          en:'Open Map',           ar:'افتح الخريطة',    phrase:'open map' },
+  { icon:'fa-hands',        en:'Sign Language AI',   ar:'لغة الإشارة',     phrase:'open sign language' },
+  { icon:'fa-eye',          en:'OCR Reader',         ar:'قارئ النصوص',     phrase:'open ocr' },
+  { icon:'fa-circle-half-stroke', en:'High Contrast', ar:'تباين عالي',    phrase:'high contrast' },
+  { icon:'fa-text-height',  en:'Bigger Text',        ar:'كبر الخط',        phrase:'increase text' },
+  { icon:'fa-text-height',  en:'Smaller Text',       ar:'صغر الخط',        phrase:'decrease text' },
+  { icon:'fa-volume-high',  en:'Read Page',          ar:'اقرأ الصفحة',     phrase:'read page' },
+  { icon:'fa-stop',         en:'Stop Speaking',      ar:'وقف الكلام',      phrase:'stop reading' },
+  { icon:'fa-circle-question', en:'Help',            ar:'ساعدني',          phrase:'help' },
+  { icon:'fa-right-from-bracket', en:'Logout',       ar:'اخرج',            phrase:'logout' },
 ];
 
-// ── Build quick commands ──
-COMMANDS.forEach(cmd => {
-    const chip = document.createElement('div');
-    chip.className = 'cmd-chip';
-    chip.setAttribute('role', 'button');
-    chip.setAttribute('tabindex', '0');
-    chip.innerHTML = `<i class="fa-solid ${cmd.icon}"></i> ${cmd.label}`;
-    chip.addEventListener('click', () => handleCommand(cmd.phrase, 'user'));
-    chip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') handleCommand(cmd.phrase, 'user'); });
-    cmdGrid.appendChild(chip);
+QUICK.forEach(q => {
+  const chip = document.createElement('div');
+  chip.className = 'cmd-chip';
+  chip.innerHTML = `<div class="cmd-chip-icon"><i class="fa-solid ${q.icon}"></i></div>
+    <div>${q.en}</div><div class="cmd-chip-ar">${q.ar}</div>`;
+  chip.addEventListener('click', () => processCommand(q.phrase, 'click'));
+  chip.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') processCommand(q.phrase,'click'); });
+  chip.setAttribute('tabindex','0');
+  D.cmdGrid.appendChild(chip);
 });
 
-// ── Command Router ──
-function handleCommand(raw, source) {
-    const text = raw.trim();
-    if (!text) return;
-    if (source === 'user') addMessage(text, 'user');
-    const cmd = text.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+/* ══════════════════════════════════════════════
+   COMMAND PROCESSOR
+══════════════════════════════════════════════ */
+function processCommand(raw, source) {
+  const text = raw.trim();
+  if(!text) return;
 
-    // Navigation
-    if (/\b(go\s*home|homepage|home\s*page)\b/.test(cmd)) {
-        return respond("Navigating to the Home page now.", () => navigate(LINKS.home));
-    }
-    if (/\b(my\s*booking|booking|appointment|reservation)\b/.test(cmd)) {
-        return respond("Opening your Bookings.", () => navigate(LINKS.bookings));
-    }
-    if (/\bprofile\b/.test(cmd)) {
-        return respond("Opening your Profile.", () => navigate(LINKS.profile));
-    }
-    if (/\b(sign\s*language|sign\s*lang|asl|hand\s*sign)\b/.test(cmd)) {
-        return respond("Opening the Sign Language AI Assistant.", () => navigate(LINKS.sign_language));
-    }
-    if (/\b(ocr|ocr\s*reader|smart\s*reader|read\s*image|scan\s*text)\b/.test(cmd)) {
-        return respond("Opening the Smart OCR Reader.", () => navigate(LINKS.ocr));
-    }
-    if (/\b(voice|voice\s*companion)\b/.test(cmd) && source !== 'init') {
-        return respond("You are already on the Voice Companion page.");
-    }
-    if (/\b(logout|log\s*out|sign\s*out)\b/.test(cmd)) {
-        return respond("Logging you out now. Goodbye!", () => navigate(LINKS.logout));
-    }
-    if (/\b(service|services|find\s*help|get\s*help)\b/.test(cmd)) {
-        return respond("Opening the Home page where you can find all services.", () => navigate(LINKS.home));
+  if(source !== 'assistant') addBubble(text, 'user');
+
+  const intent = matchIntent(text);
+
+  setStatus('processing', 'Processing command...');
+
+  setTimeout(() => {
+    if(!intent) {
+      logCommand(text, 'unknown', 'fail');
+      const reply = "Sorry, I didn't understand. Try saying: open home, open OCR reader, high contrast, increase text size, read page, or help.";
+      addBubble(reply, 'assistant');
+      speak(reply, 'en');
+      setStatus('error', 'Command not understood');
+      return;
     }
 
-    // Accessibility
-    if (/\b(high\s*contrast|contrast|dark\s*mode)\b/.test(cmd)) {
-        toggleHighContrast();
-        return respond("High contrast mode has been " + (hcOn ? "enabled" : "disabled") + ".");
-    }
-    if (/\b(increase|bigger|larger|zoom\s*in)\b.*\b(text|font|size)\b/.test(cmd)
-        || /\b(text|font|size)\b.*\b(increase|bigger|larger|up)\b/.test(cmd)) {
-        changeFontSize(2);
-        return respond("Font size increased to " + fontSize + " pixels.");
-    }
-    if (/\b(decrease|smaller|reduce|zoom\s*out)\b.*\b(text|font|size)\b/.test(cmd)
-        || /\b(text|font|size)\b.*\b(decrease|smaller|reduce|down)\b/.test(cmd)) {
-        changeFontSize(-2);
-        return respond("Font size decreased to " + fontSize + " pixels.");
-    }
-    if (/\b(reset\s*(font|text)|default\s*(font|text|size))\b/.test(cmd)) {
-        fontSize = 16; applyFontSize();
-        return respond("Font size reset to 16 pixels.");
+    logCommand(text, intent.id, 'ok');
+
+    // Determine response language
+    const arabic = hasArabic(text);
+    const respLang = arabic ? 'ar' : 'en';
+    const resp = intent.response;
+
+    let replyText = '';
+    if(resp) {
+      replyText = resp[respLang] || resp.en || '';
     }
 
-    // TTS control
-    if (/\b(read\s*(this\s*)?page|read\s*aloud|speak\s*page)\b/.test(cmd)) {
-        const pageText = document.body.innerText.replace(/\s+/g,' ').trim().substring(0, 1200);
-        return respond("Reading the page content aloud.", () => speakText(pageText));
-    }
-    if (/\b(stop\s*(reading|speak|talking)|quiet|silence|shut\s*up)\b/.test(cmd)) {
-        window.speechSynthesis.cancel();
-        return respond("Stopped.", null, false);
-    }
-    if (/\b(mute|turn\s*off.*voice|disable.*voice)\b/.test(cmd)) {
-        ttsEnabled = false; ttsToggle.classList.remove('on');
-        return respond("Voice responses muted.", null, false);
-    }
-    if (/\b(unmute|turn\s*on.*voice|enable.*voice)\b/.test(cmd)) {
-        ttsEnabled = true; ttsToggle.classList.add('on');
-        return respond("Voice responses enabled.");
+    // Execute action
+    let result = null;
+    if(typeof intent.action === 'function') result = intent.action();
+
+    // Respond
+    if(replyText) {
+      if(result !== null || resp?.speak !== false) {
+        addBubble(replyText, 'assistant');
+        if(resp?.speak !== false) speak(replyText, respLang);
+      }
     }
 
-    // Help
-    if (/\b(help|what\s*(can|commands)|available|options|commands)\b/.test(cmd)) {
-        return respond(
-            "Here are things you can say: Go home · My Bookings · My Profile · Sign Language AI · OCR Reader · " +
-            "Toggle High Contrast · Increase or Decrease Text Size · Read Page · Logout. " +
-            "You can also type any command in the text box below."
-        );
-    }
-
-    // Greeting / small talk
-    if (/\b(hello|hi|hey|good\s*(morning|afternoon|evening)|greet)\b/.test(cmd)) {
-        return respond("Hello! I'm Rafiq Voice Companion. Say 'help' to hear available commands, or just tell me where you'd like to go.");
-    }
-    if (/\b(thank|thanks|thank\s*you)\b/.test(cmd)) {
-        return respond("You're welcome! Is there anything else I can help you with?");
-    }
-
-    // Fallback
-    respond(
-        "Sorry, I didn't recognise that command. Say 'help' to hear available commands, or use the quick command buttons below."
-    );
+    setStatus('executed', 'Command executed: ' + intent.id.replace(/_/g,' '));
+    setTimeout(() => setStatus('idle', 'Ready'), 2500);
+  }, 180);
 }
 
-// ── Respond ──
-function respond(text, afterFn, speak = true) {
-    addMessage(text, 'assistant');
-    if (speak && ttsEnabled) {
-        speakText(text, afterFn);
-    } else if (afterFn) {
-        setTimeout(afterFn, 400);
-    }
+/* ── special actions ── */
+function showHelp() {
+  const msg = `Commands I understand:
+
+🏠 Navigation: "open home", "my bookings", "open map", "open OCR reader", "sign language", "logout"
+
+✨ Accessibility: "high contrast", "increase text size", "decrease text size", "read page", "stop reading"
+
+🌍 Languages: You can speak English, Arabic (عربي), or Franco Arabic (مثلاً: eftah el home, kbr el font, sha8al contrast)
+
+🎙️ Tip: Click the microphone button or use the quick command chips below.`;
+  addBubble(msg, 'assistant');
+  speak('You can navigate by saying: open home, open OCR reader, my bookings, sign language AI, high contrast, increase text, or read page. I also understand Arabic and Franco Arabic commands.', 'en');
+  setStatus('executed','Help shown');
+  setTimeout(() => setStatus('idle','Ready'), 3000);
 }
 
-function speakText(text, afterFn) {
-    window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.rate  = 0.95;
-    utter.pitch = 1.05;
-    utter.lang  = 'en-US';
-    utter.onstart = () => {
-        statusDot.className = 'vc-status-dot speaking';
-        statusLabel.textContent = 'Speaking...';
-        voiceOrb.classList.add('speaking');
-        orbIcon.className = 'fa-solid fa-volume-high';
-    };
-    utter.onend = utter.onerror = () => {
-        statusDot.className = 'vc-status-dot idle';
-        statusLabel.textContent = 'Ready';
-        voiceOrb.classList.remove('speaking');
-        orbIcon.className = 'fa-solid fa-microphone';
-        if (afterFn) setTimeout(afterFn, 350);
-    };
-    window.speechSynthesis.speak(utter);
+function showGreeting() {
+  const hr = new Date().getHours();
+  const g  = hr<12 ? 'Good morning' : hr<18 ? 'Good afternoon' : 'Good evening';
+  const msg = `${g}! I'm Rafiq Voice Companion. I understand English, Arabic, and Franco Arabic. Say "help" to see all commands.`;
+  addBubble(msg, 'assistant');
+  speak(msg, 'en');
+  setStatus('executed','Greeting');
+  setTimeout(() => setStatus('idle','Ready'), 3000);
 }
 
+function readPageContent() {
+  const txt = document.body.innerText.replace(/\s+/g,' ').trim().slice(0,1000);
+  speak(txt, 'en');
+}
+
+/* ══════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════ */
 function navigate(url) {
-    if (url && url !== window.location.href) window.location.href = url;
+  if(!url || url === window.location.href) return;
+  // Use window.location.href — works with PHP routing
+  setTimeout(() => { window.location.href = url; }, 700);
 }
 
-// ── Add message bubble ──
-function addMessage(text, role) {
-    const wrap = document.createElement('div');
-    wrap.className = 'vc-msg ' + role;
-    const avatar = document.createElement('div');
-    avatar.className = 'vc-avatar';
-    avatar.innerHTML = role === 'user'
-        ? '<i class="fa-solid fa-user"></i>'
-        : '<i class="fa-solid fa-robot"></i>';
-    const bubble = document.createElement('div');
-    bubble.className = 'vc-bubble';
-    bubble.textContent = text;
-    wrap.appendChild(avatar);
-    wrap.appendChild(bubble);
-    vcChat.appendChild(wrap);
-    vcChat.scrollTop = vcChat.scrollHeight;
-}
+/* ══════════════════════════════════════════════
+   SPEECH RECOGNITION
+══════════════════════════════════════════════ */
+if(!hasSR) D.noSupport.classList.add('show');
 
-// ── Web Speech API ──
-const hasSpeechAPI = ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-if (!hasSpeechAPI) supportBanner.classList.add('visible');
+D.langSel.addEventListener('change', () => {
+  const labels = {'en-US':'English','ar-EG':'Arabic (EG)','ar-SA':'Arabic','auto':'Auto'};
+  D.langChip.textContent = labels[D.langSel.value] || D.langSel.value;
+  D.statusLangChip.textContent = D.langSel.value.toUpperCase().slice(0,2);
+  if(recognizing) { stopListening(); startListening(); }
+});
 
-function setupRecognition() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return null;
-    const r = new SR();
-    r.lang = 'en-US';
-    r.continuous = false;
-    r.interimResults = true;
-    r.maxAlternatives = 1;
+D.micBtn.addEventListener('click',   () => recognizing ? stopListening() : startListening());
+D.voiceOrb.addEventListener('click', () => recognizing ? stopListening() : startListening());
 
-    r.onstart = () => {
-        recognizing = true;
-        statusDot.className = 'vc-status-dot listening';
-        statusLabel.textContent = 'Listening...';
-        micBtn.classList.add('listening');
-        micIcon.className = 'fa-solid fa-stop';
-        micLabel.textContent = 'Stop Listening';
-        voiceOrb.classList.add('listening');
-        orbIcon.className = 'fa-solid fa-microphone';
-    };
+function setupRec() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return null;
+  const r = new SR();
+  const sel = D.langSel.value;
+  r.lang = sel === 'auto' ? '' : sel;
+  r.continuous = false;
+  r.interimResults = true;
+  r.maxAlternatives = 3;
 
-    r.onresult = e => {
-        let interim = '';
-        let final   = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-            if (e.results[i].isFinal) final += e.results[i][0].transcript;
-            else interim += e.results[i][0].transcript;
-        }
-        if (interim) {
-            statusLabel.textContent = 'Heard: "' + interim + '"';
-        }
-        if (final.trim()) {
-            vcTextInput.value = '';
-            handleCommand(final.trim(), 'user');
-        }
-    };
+  r.onstart = () => {
+    recognizing = true;
+    setStatus('listening','Listening...');
+    D.micBtn.classList.add('active');
+    D.micIco.className = 'fa-solid fa-stop';
+    D.micLbl.textContent = 'Stop Listening';
+    D.voiceOrb.classList.add('listening');
+    D.orbIco.className = 'fa-solid fa-microphone';
+    D.transcriptBox.textContent = '...';
+  };
 
-    r.onerror = e => {
-        if (e.error === 'no-speech') {
-            respond("I didn't catch anything. Please try again.", null, false);
-        } else if (e.error === 'not-allowed') {
-            supportBanner.classList.add('visible');
-            supportBanner.querySelector('span').textContent =
-                'Microphone permission was denied. Please allow microphone access in your browser settings.';
-        }
-        stopListening();
-    };
+  r.onresult = e => {
+    let interim = '', final = '';
+    for(let i = e.resultIndex; i < e.results.length; i++) {
+      if(e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    D.transcriptBox.textContent = interim || final || '...';
+    if(final.trim()) processCommand(final.trim(), 'voice');
+  };
 
-    r.onend = () => stopListening();
-    return r;
+  r.onerror = e => {
+    if(e.error === 'no-speech') {
+      addBubble("I didn't hear anything. Please try again.", 'assistant', true);
+    } else if(e.error === 'not-allowed') {
+      D.noSupport.classList.add('show');
+      D.noSupport.querySelector('span').textContent = 'Microphone permission denied. Please allow microphone access in browser settings.';
+    }
+    stopListening();
+  };
+
+  r.onend = () => stopListening();
+  return r;
 }
 
 function startListening() {
-    if (!hasSpeechAPI) { alert('Voice input is not supported in this browser. Please use Chrome or Edge.'); return; }
-    if (recognizing) { stopListening(); return; }
-    recognition = setupRecognition();
-    if (recognition) recognition.start();
+  if(!hasSR) { alert('Voice not supported. Please use Chrome or Edge.'); return; }
+  recognition = setupRec();
+  if(recognition) recognition.start();
 }
 
 function stopListening() {
-    recognizing = false;
-    if (recognition) { try { recognition.stop(); } catch(e){} }
-    statusDot.className = 'vc-status-dot idle';
-    statusLabel.textContent = 'Ready';
-    micBtn.classList.remove('listening');
-    micIcon.className = 'fa-solid fa-microphone';
-    micLabel.textContent = 'Start Listening';
-    voiceOrb.classList.remove('listening');
-    orbIcon.className = 'fa-solid fa-microphone';
+  recognizing = false;
+  if(recognition) { try { recognition.stop(); } catch(e){} }
+  setStatus('idle','Ready');
+  D.micBtn.classList.remove('active');
+  D.micIco.className = 'fa-solid fa-microphone';
+  D.micLbl.textContent = 'Start Listening';
+  D.voiceOrb.classList.remove('listening');
+  D.orbIco.className = 'fa-solid fa-microphone';
 }
 
-micBtn.addEventListener('click', startListening);
-voiceOrb.addEventListener('click', () => { if (!recognizing) startListening(); else stopListening(); });
+/* ══════════════════════════════════════════════
+   TEXT INPUT
+══════════════════════════════════════════════ */
+D.sendBtn.addEventListener('click', sendText);
+D.textInput.addEventListener('keydown', e => { if(e.key === 'Enter') sendText(); });
 
-stopSpeakBtn.addEventListener('click', () => {
-    window.speechSynthesis.cancel();
-    statusDot.className = 'vc-status-dot idle';
-    statusLabel.textContent = 'Ready';
-    voiceOrb.classList.remove('speaking');
-    orbIcon.className = 'fa-solid fa-microphone';
-});
+function sendText() {
+  const val = D.textInput.value.trim();
+  if(!val) return;
+  D.textInput.value = '';
+  D.transcriptBox.textContent = val;
+  processCommand(val, 'text');
+}
 
-clearChatBtn.addEventListener('click', () => {
-    vcChat.innerHTML = '';
-    addGreeting();
-});
+/* ══════════════════════════════════════════════
+   STATUS
+══════════════════════════════════════════════ */
+function setStatus(state, label) {
+  D.statusDot.className = 'status-dot ' + state;
+  D.statusLabel.textContent = label;
+}
 
-// ── Text input ──
-vcTextInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { vcSendBtn.click(); }
-});
-vcSendBtn.addEventListener('click', () => {
-    const val = vcTextInput.value.trim();
-    if (!val) return;
-    vcTextInput.value = '';
-    handleCommand(val, 'user');
-});
+/* ══════════════════════════════════════════════
+   CHAT BUBBLES
+══════════════════════════════════════════════ */
+function addBubble(text, role, system=false) {
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + role;
+  const av = document.createElement('div');
+  av.className = 'msg-avatar';
+  av.innerHTML = role==='user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+  const bbl = document.createElement('div');
+  bbl.className = 'msg-bubble' + (system?' system':'');
+  bbl.textContent = text;
+  if(hasArabic(text)) { bbl.dir='rtl'; bbl.style.textAlign='right'; }
+  wrap.appendChild(av); wrap.appendChild(bbl);
+  D.chatBox.appendChild(wrap);
+  D.chatBox.scrollTop = D.chatBox.scrollHeight;
+}
 
-// ── Accessibility controls ──
-hcToggle.addEventListener('click', () => toggleHighContrast());
-ttsToggle.addEventListener('click', () => {
-    ttsEnabled = !ttsEnabled;
-    ttsToggle.classList.toggle('on', ttsEnabled);
-});
-fontDecBtn.addEventListener('click', () => changeFontSize(-2));
-fontIncBtn.addEventListener('click', () => changeFontSize(2));
+D.clearChatBtn.addEventListener('click', () => { D.chatBox.innerHTML = ''; addGreeting(); });
 
-function toggleHighContrast() {
-    hcOn = !hcOn;
-    document.body.classList.toggle('hc-mode', hcOn);
-    hcToggle.classList.toggle('on', hcOn);
+/* ══════════════════════════════════════════════
+   TTS
+══════════════════════════════════════════════ */
+D.stopSpeakBtn.addEventListener('click', () => { window.speechSynthesis.cancel(); D.voiceOrb.classList.remove('speaking'); });
+D.ttsToggle.addEventListener('click', () => { ttsEnabled=!ttsEnabled; D.ttsToggle.classList.toggle('on',ttsEnabled); });
+
+function speak(text, langHint='en') {
+  if(!ttsEnabled) return;
+  window.speechSynthesis.cancel();
+  const arabic = hasArabic(text) || langHint==='ar';
+  const utter  = new SpeechSynthesisUtterance(text);
+  utter.lang   = arabic ? 'ar-SA' : 'en-US';
+  utter.rate   = 0.92;
+  const voices = window.speechSynthesis.getVoices();
+  const voice  = voices.find(v => arabic ? v.lang.startsWith('ar') : v.lang.startsWith('en-US'))
+              || voices.find(v => arabic ? v.lang.startsWith('ar') : v.lang.startsWith('en'));
+  if(voice) utter.voice = voice;
+  utter.onstart = () => { D.voiceOrb.classList.add('speaking'); D.orbIco.className='fa-solid fa-volume-high'; };
+  utter.onend   = () => { D.voiceOrb.classList.remove('speaking'); D.orbIco.className='fa-solid fa-microphone'; };
+  window.speechSynthesis.speak(utter);
+}
+
+/* ══════════════════════════════════════════════
+   COMMAND LOG
+══════════════════════════════════════════════ */
+let logCount = 0;
+function logCommand(said, intent, result) {
+  if(logCount === 0) D.cmdLog.innerHTML = '';
+  logCount++;
+  const item = document.createElement('div');
+  item.className = 'cmd-log-item';
+  item.innerHTML = `<span class="cli-said">"${escHtml(said)}"</span>
+    <span class="cli-intent">${escHtml(intent.replace(/_/g,' '))}</span>
+    <span class="cli-result ${result}">${result==='ok'?'✓ Executed':'✗ Unknown'}</span>`;
+  D.cmdLog.insertBefore(item, D.cmdLog.firstChild);
+  if(logCount > 20) D.cmdLog.removeChild(D.cmdLog.lastChild);
+}
+
+/* ══════════════════════════════════════════════
+   ACCESSIBILITY
+══════════════════════════════════════════════ */
+D.hcToggle.addEventListener('click', () => setHighContrast(!hcOn));
+D.fontInc.addEventListener('click', () => changeFontSize(2));
+D.fontDec.addEventListener('click', () => changeFontSize(-2));
+
+function setHighContrast(on) {
+  hcOn = on;
+  document.body.classList.toggle('hc', hcOn);
+  D.hcToggle.classList.toggle('on', hcOn);
 }
 
 function changeFontSize(delta) {
-    fontSize = Math.min(26, Math.max(12, fontSize + delta));
-    applyFontSize();
+  fontSize = Math.max(12, Math.min(28, fontSize + delta));
+  applyFont();
 }
 
-function applyFontSize() {
-    document.documentElement.style.fontSize = fontSize + 'px';
-    fontSizeVal.textContent = fontSize + 'px';
+function applyFont() {
+  document.documentElement.style.fontSize = fontSize+'px';
+  D.fontVal.textContent = fontSize+'px';
 }
 
-// ── Greeting ──
+/* ══════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════ */
+function hasArabic(t) { return /[؀-ۿ]/.test(t); }
+function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let toastT=null;
+function showToast(msg) {
+  D.toastMsg.textContent=msg; D.toast.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>D.toast.classList.remove('show'),2400);
+}
+
+/* ══════════════════════════════════════════════
+   GREETING ON LOAD
+══════════════════════════════════════════════ */
 function addGreeting() {
-    const hour = new Date().getHours();
-    const timeGreet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    addMessage(
-        timeGreet + "! I'm Rafiq Voice Companion. I can help you navigate the platform, " +
-        "control accessibility settings, and more — entirely hands-free. " +
-        "Click the microphone button or say a command to get started. " +
-        "Say 'help' to hear all available commands.",
-        'assistant'
-    );
+  const hr = new Date().getHours();
+  const g  = hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';
+  addBubble(`${g}! I'm Rafiq Voice Companion. I understand English, Arabic (عربي), and Franco Arabic. Click the microphone or type a command. Say "help" to see everything I can do.`, 'assistant');
 }
 
-// ── Init ──
+/* ══════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════ */
 addGreeting();
-speakText(
-    "Rafiq Voice Companion is ready. Say a command or press the microphone button to begin. Say help for a list of commands.",
-    null
-);
+speak("Rafiq Voice Companion is ready. Say a command or press the microphone. Say help for all available commands.", 'en');
+
+if(window.speechSynthesis) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices());
+}
+
+setStatus('idle','Ready');
 
 window.addEventListener('beforeunload', () => {
-    window.speechSynthesis.cancel();
-    if (recognition) { try { recognition.stop(); } catch(e){} }
+  window.speechSynthesis.cancel();
+  if(recognition) { try { recognition.stop(); } catch(e){} }
 });
 </script>
 </body>
