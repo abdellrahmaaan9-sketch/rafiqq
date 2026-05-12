@@ -10,5 +10,9 @@ nixPkgs = [
     "php83Extensions.gd"
 ]
 
+# Skip "composer install" — this project has no PHP package dependencies
+[phases.install]
+cmds = []
+
 [start]
 cmd = "php -S 0.0.0.0:$PORT"
